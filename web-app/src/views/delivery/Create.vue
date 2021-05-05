@@ -1,15 +1,15 @@
 <template>
   <div class="main">
     <a-steps :current="current">
-      <a-step title="填写申请信息"></a-step>
-      <a-step title="确认配送信息"/>
+      <a-step title="填写转运信息"></a-step>
+      <a-step title="确认转运信息"/>
       <a-step title="完成申请"/>
     </a-steps>
     <div class="steps-content">
       <div v-if="current === 0">
         <a-form-model :model="form" :label-col="labelCol" :wrapper-col="wrapperCol">
-          <a-form-model-item label="选择司机" required>
-            <a-select v-model="selectDriverIndex" placeholder="请选择配送司机">
+          <a-form-model-item label="选择押运员" required>
+            <a-select v-model="selectDriverIndex" placeholder="请选择押运员">
               <a-select-option :value="index" v-for="(item, index) in drivers" :key="index" :disabled="item.driving">
                 {{ item.name }}
                 <i class="dis" v-if="item.driving">
@@ -19,7 +19,7 @@
             </a-select>
           </a-form-model-item>
           <a-form-model-item label="选择运输车辆" required>
-            <a-select v-model="selectVehicleIndex" placeholder="请选择配送车辆">
+            <a-select v-model="selectVehicleIndex" placeholder="请选择转运车辆">
               <a-select-option :value="index" v-for="(item, index) in vehicles" :key="index" :disabled="item.driving">
                 {{ item.type }} : {{ item.number }}
                 <i class="dis" v-if="item.driving">
@@ -27,6 +27,18 @@
                   正在途中</i>
               </a-select-option>
             </a-select>
+          </a-form-model-item>
+          <a-form-model-item label="起点" required>
+            <a-input v-model="form.origin" placeholder="如：养殖场A"/>
+          </a-form-model-item>
+          <a-form-model-item label="目的地" required>
+            <a-input v-model="form.destination" placeholder="如：屠宰场B"/>
+          </a-form-model-item>
+          <a-form-model-item label="路线规划">
+            <a-input v-model="form.routePlan" placeholder="如：高速G1 → 中转站C → 终点"/>
+          </a-form-model-item>
+          <a-form-model-item label="途经节点">
+            <a-input v-model="form.routeNodes" placeholder="如：A-检查点1-中转站C-检查点2-B"/>
           </a-form-model-item>
           <a-form-model-item label="预计交货时间" required>
             <a-date-picker
@@ -42,21 +54,21 @@
           </a-form-model-item>
           <a-form-model-item label="注意事项">
             <a-checkbox-group v-model="form.cares">
-              <a-checkbox value="冰柜冷藏" name="type">
-                冰柜冷藏
+              <a-checkbox value="隔离区装载" name="type">
+                隔离区装载
               </a-checkbox>
-              <a-checkbox value="注意易碎" name="type">
-                注意易碎
+              <a-checkbox value="减少应激" name="type">
+                减少应激
               </a-checkbox>
-              <a-checkbox value="防止高温" name="type">
-                防止高温
+              <a-checkbox value="控温通风" name="type">
+                控温通风
               </a-checkbox>
             </a-checkbox-group>
           </a-form-model-item>
-          <a-form-model-item label="客户电话" required>
+          <a-form-model-item label="联系人电话" required>
             <a-input v-model="form.phone"/>
           </a-form-model-item>
-          <a-form-model-item label="客户地址" required>
+          <a-form-model-item label="目的地地址" required>
             <a-input v-model="form.address" type="textarea" :rows="4"/>
           </a-form-model-item>
           <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
@@ -67,12 +79,16 @@
         </a-form-model>
       </div>
       <div v-if="current === 1" class="check">
-        <p>送货司机： {{ form.driver }}</p>
+        <p>押运员： {{ form.driver }}</p>
         <p>车牌号码： {{ form.number }}</p>
+        <p>起点： {{ form.origin }}</p>
+        <p>目的地： {{ form.destination }}</p>
+        <p>路线规划： {{ form.routePlan }}</p>
+        <p>途经节点： {{ form.routeNodes }}</p>
         <p>加急处理： {{ form.urgent }}</p>
         <p>注意事项： {{ form.care }}</p>
-        <p>客户电话： {{ form.phone }}</p>
-        <p>客户地址： {{ form.address }}</p>
+        <p>联系人电话： {{ form.phone }}</p>
+        <p>目的地地址： {{ form.address }}</p>
         <p>预计送达： {{ form.time }}</p>
         <a-button type="danger" style="margin-right: 20px" :loading="loading" @click="submit">提交</a-button>
         <a-button @click="current = 0">上一步</a-button>
@@ -80,17 +96,17 @@
       <div v-if="current === 2">
         <a-result
             status="success"
-            title="Submitted Successfully"
-            sub-title="Please wait for the administrator to review the delivery request."
+            title="提交成功"
+            sub-title="请等待管理端审核转运申请。"
         >
           <template #extra>
             <router-link to="/delivery/list">
               <a-button key="console" type="primary">
-                Go Console
+                查看转运单
               </a-button>
             </router-link>
             <a-button key="buy" @click="current = 0">
-              Submit Again
+              继续提交
             </a-button>
           </template>
         </a-result>
@@ -122,6 +138,13 @@ export default {
         number: '',
         phone: '',
         address: '',
+        origin: '',
+        destination: '',
+        routePlan: '',
+        routeNodes: '',
+        currentNode: '',
+        warningLevel: 0,
+        warningNote: '',
         urgent: false,
         cares: [],
         care: '',
@@ -148,6 +171,7 @@ export default {
       for (let i = 0; i < this.form.cares.length; i++) {
         care += this.form.cares[i] + ", "
       }
+      this.form.currentNode = this.form.origin
       this.form.driver = this.drivers[this.selectDriverIndex].name
       this.form.did = this.drivers[this.selectDriverIndex].id
       this.form.number = this.vehicles[this.selectVehicleIndex].number

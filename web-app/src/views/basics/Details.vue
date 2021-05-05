@@ -8,51 +8,51 @@
     </div>
     <div style="display: flex">
       <a-button class="editable-btn" @click="handleSubmit('in')">
-        入库商品
+        入栏登记
       </a-button>
       <a-button class="editable-btn" @click="handleSubmit('out')">
-        出库商品
+        出栏登记
       </a-button>
       <download-excel
           class="export-excel-wrapper"
           :data="data"
           :fields="json_fields"
-          name="库存报表.xls">
+          name="存栏报表.xls">
         <a-button class="editable-btn">
           <a-icon type="cloud-download"/>
-          下载库存报表 Excel
+          下载存栏报表 Excel
         </a-button>
       </download-excel>
       <a-button class="editable-btn" @click="recordVisible = true">
         <a-icon type="retweet"/>
-        出入库记录 Excel
+        出入栏记录 Excel
       </a-button>
     </div>
 
     <a-table :loading="loading" :columns="columns" :data-source="data" rowKey="id">
       <a slot="name" slot-scope="text">{{ text }}</a>
-      <span slot="customTitle"><a-icon type="smile-o"/> 商品名</span>
+      <span slot="customTitle"><a-icon type="smile-o"/> 畜种</span>
       <span slot="count" slot-scope="count">
         <a-tag color="#108ee9">{{ count }}</a-tag>
       </span>
     </a-table>
 
     <a-modal
-        title="入库 ｜ 出库"
+        title="入栏 ｜ 出栏"
         :closable="false"
         :visible="visible"
         @ok="submit"
         @cancel="visible = false"
     >
       <a-form-model :model="form">
-        <a-form-model-item label="请选商品">
-          <a-select v-model="selectIndex" placeholder="请选择入库的商品">
+        <a-form-model-item label="请选择畜种">
+          <a-select v-model="selectIndex" placeholder="请选择入栏的畜种">
             <a-select-option :value="index" v-for="(item, index) in commodityList" :key="index">
               {{ item.name }}
             </a-select-option>
           </a-select>
         </a-form-model-item>
-        <a-form-model-item label="商品数量">
+        <a-form-model-item label="数量">
           <a-input-number id="inputNumber" v-model="form.count" :min="1"/>
         </a-form-model-item>
         <a-form-model-item label="备注">
@@ -62,7 +62,7 @@
     </a-modal>
 
     <a-modal
-        title="出入库记录"
+        title="出入栏记录"
         width="80%"
         :visible="recordVisible"
         :footer="null"
@@ -81,7 +81,7 @@ import InventoryRecords from "../../components/InventoryRecords";
 
 const columns = [
   {
-    title: '商品ID',
+    title: '畜种ID',
     dataIndex: 'id',
     key: 'id',
     width: '50%'
@@ -93,7 +93,7 @@ const columns = [
     scopedSlots: {customRender: 'name'},
   },
   {
-    title: '库存数量',
+    title: '存栏数量',
     dataIndex: 'count',
     key: 'count',
     scopedSlots: {customRender: 'count'},
@@ -107,9 +107,9 @@ export default {
   data() {
     return {
       json_fields: {
-        "商品ID": "cid",
-        "商品名称": "name",
-        "库存盘点数量": "count",
+        "畜种ID": "cid",
+        "畜种名称": "name",
+        "存栏数量": "count",
       },
       id: this.$route.params.id,
       loading: false,

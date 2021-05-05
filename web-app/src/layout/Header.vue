@@ -4,12 +4,12 @@
       <template slot="title">
         <span>刷新页面</span>
       </template>
-      <a-button @click="clickReload" class="reload-btn" icon="reload" type="link">Reload</a-button>
+      <a-button @click="clickReload" class="reload-btn" icon="reload" type="link">刷新</a-button>
     </a-tooltip>
 
     <a-tooltip placement="bottom" class="question-btn">
       <template slot="title">
-        <span>About</span>
+        <span>关于</span>
       </template>
       <a-button class="reload-btn" icon="question-circle" type="link"/>
     </a-tooltip>
@@ -25,12 +25,16 @@
       </a-button>
       <a-menu slot="overlay">
         <a-menu-item>
-          <a-icon class="icon" type="smile"/>
-          个人中心
+          <router-link :to="profilePath">
+            <a-icon class="icon" type="smile"/>
+            {{ profileLabel }}
+          </router-link>
         </a-menu-item>
-        <a-menu-item>
-          <a-icon class="icon" type="setting"/>
-          系统设置
+        <a-menu-item v-if="isAdmin">
+          <router-link to="/role">
+            <a-icon class="icon" type="setting"/>
+            权限设置
+          </router-link>
         </a-menu-item>
         <a-menu-divider/>
         <a-menu-item @click="handleLogout">
@@ -48,7 +52,23 @@ export default {
 
   data() {
     return {
-      details: this.$store.state.user.details ? this.$store.state.user.details : {}
+    }
+  },
+
+  computed: {
+    details() {
+      return this.$store.state.user.details ? this.$store.state.user.details : {}
+    },
+    isAdmin() {
+      const role = this.$store.state.user.role
+      if (role) return role === "admin"
+      return !!(this.details && this.details.roles)
+    },
+    profilePath() {
+      return this.isAdmin ? "/security" : "/user/profile"
+    },
+    profileLabel() {
+      return this.isAdmin ? "个人中心" : "用户信息"
     }
   },
 

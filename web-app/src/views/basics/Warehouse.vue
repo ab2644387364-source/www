@@ -5,7 +5,7 @@
         <a-col :span="8" class="item">
           <a-card hoverable class="add-item" @click="visible = true">
             <a-icon type="plus"/>
-            添加仓库
+            添加中转站
           </a-card>
         </a-col>
         <a-col :span="8" v-for="(item, index) in this.data" :key="index" class="item">
@@ -14,12 +14,12 @@
               <span>负责人: {{ item.principle }}</span>
               <span>
                 <router-link :to="'/warehouse/' + item.id">
-                  <a-icon type="bar-chart"/> 库存管理
+                  <a-icon type="bar-chart"/> 存栏管理
                 </router-link>
               </span>
             </template>
             <a-card-meta
-                :title="(index+1) +'号仓库'"
+                :title="item.name"
                 :description="'ID: ' + item.id">
               <img class="image" slot="avatar" :src="imgList[Math.floor(Math.random() * 3)]"
                    alt=""/>
@@ -30,12 +30,13 @@
     </a-spin>
 
     <a-modal
-        title="新增仓库"
+        title="新增中转站"
         :visible="visible"
         @ok="submit"
         @cancel="visible = false"
     >
-      <a-input v-model="form.principle" addon-before="仓库负责人" style="width: 300px"></a-input>
+      <a-input v-model="form.name" addon-before="中转站名称" style="width: 300px;margin-bottom: 20px"></a-input>
+      <a-input v-model="form.principle" addon-before="负责人" style="width: 300px"></a-input>
     </a-modal>
   </div>
 </template>
@@ -48,7 +49,7 @@ export default {
   data() {
     return {
       visible: false,
-      form: {id: '', principle: ''},
+      form: {id: '', principle: '', name: ''},
       spinning: false,
       data: [],
       imgList: [

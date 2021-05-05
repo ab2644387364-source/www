@@ -2,12 +2,17 @@
   <div>
     <a-table :loading="loading" :columns="columns" :data-source="data" bordered rowKey="id">
       <span slot="status" slot-scope="status">
-        <a-tag v-if="status===0" color="#f50">等待审核</a-tag>
-        <a-tag v-if="status===1" color="#87d068">正在运输</a-tag>
-        <a-tag v-if="status===2" color="#2db7f5">配送完成</a-tag>
+        <a-tag v-if="status===0" color="#f50">待调度</a-tag>
+        <a-tag v-if="status===1" color="#87d068">转运中</a-tag>
+        <a-tag v-if="status===2" color="#2db7f5">已完成</a-tag>
+      </span>
+      <span slot="warningLevel" slot-scope="warningLevel">
+        <a-tag v-if="warningLevel===2" color="#f5222d">严重</a-tag>
+        <a-tag v-else-if="warningLevel===1" color="#fa8c16">一般</a-tag>
+        <a-tag v-else color="#52c41a">正常</a-tag>
       </span>
       <template
-          v-for="col in ['phone','address']"
+          v-for="col in ['phone','address','routePlan','currentNode']"
           :slot="col"
           slot-scope="text, record, index"
       >
@@ -34,25 +39,25 @@
           <span v-else>
           <a :disabled="editingKey !== ''" @click="() => edit(record.id)">编辑</a>
         </span>
-          <a-button @click="review(index)" type="link" v-if="record.status===0">审核</a-button>
-          <a-button @click="review(index)" type="link" v-if="record.status===1">配送</a-button>
+          <a-button @click="review(index)" type="link" v-if="record.status===0">调度</a-button>
+          <a-button @click="review(index)" type="link" v-if="record.status===1">跟踪</a-button>
           <a-button @click="review(index)" type="link" v-if="record.status===2">查看</a-button>
         </div>
       </template>
     </a-table>
 
     <a-modal
-        title="Title"
+        title="转运详情"
         :visible="visible"
         @ok="submitForm"
         @cancel="visible = false"
     >
       <a-form-model :model="form">
         <a-form-model-item label="姓名">
-          <a-input v-model="form.name" placeholder="请输入司机姓名"/>
+          <a-input v-model="form.name" placeholder="请输入押运员姓名"/>
         </a-form-model-item>
         <a-form-model-item label="身份证号">
-          <a-input v-model="form.idCard" placeholder="请输入司机身份证信息"/>
+          <a-input v-model="form.idCard" placeholder="请输入押运员身份证信息"/>
         </a-form-model-item>
         <a-form-model-item label="联系方式">
           <a-input v-model="form.phone" placeholder="请输入手机号码"/>
@@ -60,8 +65,8 @@
         <a-form-item label="驾照信息">
           <a-row :gutter="20">
             <a-col :span="12">
-              <a-input v-model="form.license" addon-before="驾驶证" default-value="0571"/>
-            </a-col>
+            <a-input v-model="form.license" addon-before="驾驶证" default-value="0571"/>
+          </a-col>
             <a-col :span="7">
               <a-input-number v-model="form.score" addon-before="分数" default-value="12" :min="0" :max="12"/>
             </a-col>
@@ -73,32 +78,34 @@
             <a-radio value="女性">女性</a-radio>
           </a-radio-group>
         </a-form-model-item>
-        <a-form-model-item label="家庭住址">
+        <a-form-model-item label="住址">
           <a-input v-model="form.address" type="textarea"/>
         </a-form-model-item>
       </a-form-model>
     </a-modal>
 
     <a-modal
-        title="Title"
+        title="转运调度与跟踪"
         :visible="visible2"
         width="60%"
         :footer="null"
         @cancel="visible2 = false"
     >
       <a-steps :current="select.status" style="padding: 50px">
-        <a-step title="确认信息无误"/>
-        <a-step title="开始配送"/>
-        <a-step title="配送完成"/>
+        <a-step title="确认调度信息"/>
+        <a-step title="开始转运"/>
+        <a-step title="转运完成"/>
       </a-steps>
       <div class="content">
         <div v-if="select.status === 0" class="check">
-          <p>送货司机： {{ select.driver }}</p>
+          <p>押运员： {{ select.driver }}</p>
           <p>车牌号码： {{ select.number }}</p>
+          <p>起点： {{ select.origin }}</p>
+          <p>目的地： {{ select.destination }}</p>
           <p>加急处理： {{ select.urgent }}</p>
           <p>注意事项： {{ select.care }}</p>
-          <p>客户电话： {{ select.phone }}</p>
-          <p>客户地址： {{ select.address }}</p>
+          <p>联系人电话： {{ select.phone }}</p>
+          <p>目的地地址： {{ select.address }}</p>
           <p>预计送达： {{ select.time }}</p>
           <a-button type="danger" style="margin-right: 20px" :loading="loading" @click="agree">通过</a-button>
           <a-button @click="visible2 = false">不通过</a-button>
@@ -106,11 +113,11 @@
         <div v-if="select.status === 1">
           <a-result
               status="success"
-              title="Successfully passed the audit!"
+              title="审核通过，转运中"
               >
             <template #extra>
               <a-button @click="service" key="console" type="primary">
-                已送达目的地
+                已送达
               </a-button>
             </template>
           </a-result>
@@ -118,7 +125,7 @@
         <div v-if="select.status === 2">
           <a-result
               status="success"
-              title="运输订单已成功送达"
+              title="转运单已完成"
           >
             <template #extra>
               <a-button @click="visible2 = false" key="console" type="primary">
@@ -126,6 +133,33 @@
               </a-button>
             </template>
           </a-result>
+        </div>
+        <div class="track-edit">
+          <a-divider>路线跟踪与异常</a-divider>
+          <a-form-model :model="select" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+            <a-form-model-item label="路线规划">
+              <a-input v-model="select.routePlan"/>
+            </a-form-model-item>
+            <a-form-model-item label="途经节点">
+              <a-input v-model="select.routeNodes"/>
+            </a-form-model-item>
+            <a-form-model-item label="当前位置">
+              <a-input v-model="select.currentNode"/>
+            </a-form-model-item>
+            <a-form-model-item label="异常等级">
+              <a-select v-model="select.warningLevel">
+                <a-select-option :value="0">无</a-select-option>
+                <a-select-option :value="1">一般</a-select-option>
+                <a-select-option :value="2">严重</a-select-option>
+              </a-select>
+            </a-form-model-item>
+            <a-form-model-item label="异常说明">
+              <a-input v-model="select.warningNote" type="textarea"/>
+            </a-form-model-item>
+          </a-form-model>
+          <a-button type="primary" :loading="saving" @click="saveTrack">
+            保存跟踪信息
+          </a-button>
         </div>
       </div>
 
@@ -139,7 +173,7 @@ import {FindAllDistribution, SaveDistribution} from "../../api/distribution";
 
 const columns = [
   {
-    title: '司机',
+    title: '押运员',
     dataIndex: 'driver',
     scopedSlots: {customRender: 'driver'},
   },
@@ -149,14 +183,37 @@ const columns = [
     scopedSlots: {customRender: 'number'},
   },
   {
-    title: '客户电话',
+    title: '起点',
+    dataIndex: 'origin',
+  },
+  {
+    title: '目的地',
+    dataIndex: 'destination',
+  },
+  {
+    title: '联系人电话',
     dataIndex: 'phone',
     scopedSlots: {customRender: 'phone'},
   },
   {
-    title: '客户地址',
+    title: '目的地地址',
     dataIndex: 'address',
     scopedSlots: {customRender: 'address'},
+  },
+  {
+    title: '路线规划',
+    dataIndex: 'routePlan',
+    scopedSlots: {customRender: 'routePlan'},
+  },
+  {
+    title: '当前位置',
+    dataIndex: 'currentNode',
+    scopedSlots: {customRender: 'currentNode'},
+  },
+  {
+    title: '异常等级',
+    dataIndex: 'warningLevel',
+    scopedSlots: {customRender: 'warningLevel'},
   },
   {
     title: '注意事项',
@@ -185,6 +242,7 @@ export default {
     return {
       select: {},
       loading: false,
+      saving: false,
       form: {
         cacheData: [],
         name: '',
@@ -220,7 +278,7 @@ export default {
     },
     submitForm() {
       SaveDistribution(this.form).then((res) => {
-        if (res.status) this.$message.success('司机信息提交成功');
+        if (res.status) this.$message.success('押运员信息提交成功');
         this.visible = false
         this.loadTableData()
       })
@@ -278,12 +336,23 @@ export default {
 
     agree() {
       this.select.status = 1
+      this.select.currentNode = this.select.currentNode || this.select.origin
       SaveDistribution(this.select)
     },
 
     service(){
       this.select.status = 2
+      this.select.currentNode = this.select.destination || this.select.currentNode
       SaveDistribution(this.select)
+    },
+
+    saveTrack() {
+      this.saving = true
+      SaveDistribution(this.select).then((res) => {
+        if (res.status) this.$message.success("跟踪信息已更新")
+        this.saving = false
+        this.loadTableData()
+      })
     },
 
   },
@@ -303,6 +372,9 @@ export default {
   padding: 50px 0;
 }
 
+.track-edit {
+  margin-top: 20px;
+}
 
 .check {
   padding-left: 200px;

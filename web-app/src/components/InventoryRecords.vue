@@ -4,12 +4,12 @@
         class="export-excel-wrapper"
         :data="data"
         :fields="json_fields"
-        name="出入库记录.xls">
+        name="出入栏记录.xls">
       <a-button class="btn" icon="download" type="primary">下载Excel表格</a-button>
     </download-excel>
     <a-table :columns="columns" :data-source="data" rowKey="id">
       <span slot="type" slot-scope="type">
-        <a-tag :color="type === -1 ? 'green' : 'cyan'">{{ type === -1 ? '出库' : '入库' }}</a-tag>
+        <a-tag :color="type === -1 ? 'green' : 'cyan'">{{ type === -1 ? '出栏' : '入栏' }}</a-tag>
       </span>
     </a-table>
   </div>
@@ -22,7 +22,7 @@ const columns = [
   {
     dataIndex: 'name',
     key: 'name',
-    title: '商品',
+    title: '畜种',
   },
   {
     title: '数量',
@@ -60,13 +60,13 @@ export default {
       data: [],
       columns,
       json_fields: {
-        "商品ID": "cid",
-        "商品名称": "name",
+        "畜种ID": "cid",
+        "畜种名称": "name",
         "类型": {
           field: 'type',
           callback: (value) => {
             console.log(value)
-            return value === -1 ? '出库' : '入库'
+            return value === -1 ? '出栏' : '入栏'
           }
         },
         "数量": "count",

@@ -29,6 +29,7 @@ public class ResponseResult<T> {
     }
 
     //默认附带msg和data
+
     public ResponseResult(String msg, T data) {
         this.code = 200;
         this.status = true;

@@ -41,7 +41,7 @@ export default {
 
         option = {
           title: {
-            text: '商品入库排行分析',
+            text: '牲畜入栏排行分析',
             left: 'center'
           },
           tooltip: {
@@ -53,7 +53,7 @@ export default {
           },
           series: [
             {
-              name: '访问来源',
+              name: '牲畜来源',
               type: 'pie',
               radius: '50%',
               data: commodityList,

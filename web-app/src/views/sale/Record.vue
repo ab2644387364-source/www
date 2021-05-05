@@ -2,7 +2,7 @@
   <div>
     <a-table :loading="loading" :columns="columns" :data-source="data" rowKey="id">
       <a slot="company" slot-scope="company">{{ company }}</a>
-      <span slot="customTitle"><a-icon type="bank" /> 公司名称</span>
+      <span slot="customTitle"><a-icon type="bank" /> 合作单位</span>
       <span slot="action" slot-scope="text, record, index">
         <a-tag color="red" v-if="!record.pay">等待结款</a-tag>
         <a-tag color="green" v-if="record.pay">结款完成</a-tag>
@@ -24,22 +24,22 @@ const columns = [
     scopedSlots: {customRender: 'company'},
   },
   {
-    title: '打款帐号',
+    title: '结算账号',
     dataIndex: 'number',
     key: 'number',
   },
   {
-    title: '商品',
+    title: '转运畜种',
     dataIndex: 'commodity',
     key: 'commodity',
   },
   {
-    title: '数量',
+    title: '转运数量',
     dataIndex: 'count',
     key: 'count',
   },
   {
-    title: '总计',
+    title: '费用估算',
     dataIndex: 'price',
     key: 'price',
   },
@@ -54,7 +54,7 @@ const columns = [
     key: 'description',
   },
   {
-    title: '开票时间',
+    title: '登记时间',
     dataIndex: 'createAt',
     key: 'createAt',
   },
@@ -96,14 +96,14 @@ export default {
     confirm(record, index) {
       let that = this
       this.$confirm({
-        title: '销售结款',
-        content: '我已确定' + record.company + '的销售金额 ¥' + record.price + '已经打入账户!',
+        title: '流转结算',
+        content: '我已确认' + record.company + '的费用 ¥' + record.price + '已经完成结算!',
         okText: '确认',
         cancelText: '取消',
         onOk() {
           that.data[index].pay = true
           SaveSale(that.data[index]).then((res) => {
-            if (res.status) that.$message.success("销售结款成功")
+            if (res.status) that.$message.success("流转结算成功")
           })
         },
       });

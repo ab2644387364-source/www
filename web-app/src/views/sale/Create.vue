@@ -8,20 +8,20 @@
     <div class="steps-content">
       <div v-if="current === 0">
         <a-form-model :model="form" :label-col="labelCol" :wrapper-col="wrapperCol">
-          <a-form-model-item label="公司名称" required>
+          <a-form-model-item label="合作单位" required>
             <a-input v-model="form.company"/>
           </a-form-model-item>
-          <a-form-model-item label="打款账号" required>
+          <a-form-model-item label="结算账号" required>
             <a-input v-model="form.number"/>
           </a-form-model-item>
-          <a-form-model-item label="售出商品" required>
-            <a-select v-model="selectIndex" placeholder="请选择商品">
+          <a-form-model-item label="转运畜种" required>
+            <a-select v-model="selectIndex" placeholder="请选择畜种">
               <a-select-option :value="index" v-for="(item, index) in commodityList" :key="index">
                 {{ item.name }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
-          <a-form-model-item label="商品数量" required>
+          <a-form-model-item label="转运数量" required>
             <a-input-number v-model="form.count"/>
           </a-form-model-item>
           <a-form-model-item label="预留电话" required>
@@ -38,14 +38,14 @@
         </a-form-model>
       </div>
       <div v-if="current === 1" class="check">
-        <p>收货公司： {{ form.company }}</p>
-        <p>打款账号： {{ form.number }}</p>
-        <p>售出商品： {{ form.commodity }}</p>
-        <p>商品数量： {{ form.count }}</p>
+        <p>合作单位： {{ form.company }}</p>
+        <p>结算账号： {{ form.number }}</p>
+        <p>转运畜种： {{ form.commodity }}</p>
+        <p>转运数量： {{ form.count }}</p>
         <p>预留电话： {{ form.phone }}</p>
         <p>备注信息： {{ form.description }}</p>
         <a-divider orientation="right">
-          金额总计： {{ form.price }}
+          费用估算： {{ form.price }}
         </a-divider>
         <a-button type="danger" style="margin-right: 20px" :loading="loading" @click="submit">提交</a-button>
         <a-button @click="current = 0">上一步</a-button>
@@ -53,17 +53,17 @@
       <div v-if="current === 2">
         <a-result
             status="success"
-            title="Submitted Successfully"
-            sub-title="Please wait for the administrator to review the delivery request."
+            title="提交成功"
+            sub-title="请等待管理端审核流转记录。"
         >
           <template #extra>
             <router-link to="/sale/record">
               <a-button key="console" type="primary">
-                Go Back
+                返回列表
               </a-button>
             </router-link>
             <a-button key="buy" @click="current = 0">
-              Submit Again
+              继续提交
             </a-button>
           </template>
         </a-result>

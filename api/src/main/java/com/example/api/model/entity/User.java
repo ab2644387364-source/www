@@ -21,7 +21,7 @@ public class User {
     @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
-    private String username;
+    private String email;
 
     private String password;
 

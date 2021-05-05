@@ -2,7 +2,7 @@
   <div>
     <a-button size="large" class="editable-add-btn" @click="visible = true">
       <a-icon type="plus"/>
-      新增驾驶员
+      新增押运员
     </a-button>
     <a-table :loading="loading" :columns="columns" :data-source="data" bordered rowKey="id">
       <template
@@ -35,7 +35,7 @@
         </span>
           <a-popconfirm placement="top" ok-text="Yes" cancel-text="No" @confirm="confirm(record.id)">
             <template slot="title">
-              <p> 删除驾驶员信息后将无法恢复，确定要删除吗？ </p>
+              <p> 删除押运员信息后将无法恢复，确定要删除吗？ </p>
             </template>
             <a-button type="link">删除</a-button>
           </a-popconfirm>
@@ -44,17 +44,17 @@
     </a-table>
 
     <a-modal
-        title="Title"
+        title="押运员信息"
         :visible="visible"
         @ok="submitForm"
         @cancel="visible = false"
     >
       <a-form-model :model="form">
         <a-form-model-item label="姓名">
-          <a-input v-model="form.name" placeholder="请输入司机姓名"/>
+          <a-input v-model="form.name" placeholder="请输入押运员姓名"/>
         </a-form-model-item>
         <a-form-model-item label="身份证号">
-          <a-input v-model="form.idCard" placeholder="请输入司机身份证信息"/>
+          <a-input v-model="form.idCard" placeholder="请输入押运员身份证信息"/>
         </a-form-model-item>
         <a-form-model-item label="联系方式">
           <a-input v-model="form.phone" placeholder="请输入手机号码"/>
@@ -75,7 +75,7 @@
             <a-radio value="女性">女性</a-radio>
           </a-radio-group>
         </a-form-model-item>
-        <a-form-model-item label="家庭住址">
+        <a-form-model-item label="住址">
           <a-input v-model="form.address" type="textarea"/>
         </a-form-model-item>
       </a-form-model>
@@ -119,7 +119,7 @@ const columns = [
     scopedSlots: {customRender: 'idCard'},
   },
   {
-    title: '家庭住址',
+    title: '住址',
     dataIndex: 'address',
     scopedSlots: {customRender: 'address'},
   },
@@ -168,7 +168,7 @@ export default {
     },
     submitForm() {
       SaveDriver(this.form).then((res) => {
-        if (res.status) this.$message.success('司机信息提交成功');
+        if (res.status) this.$message.success('押运员信息提交成功');
         this.visible = false
         this.loadTableData()
       })
@@ -218,7 +218,7 @@ export default {
     },
     confirm(id) {
       DeleteDriverById(id).then((res) => {
-        if (res.status)  this.$message.success('Delete success');
+        if (res.status)  this.$message.success('删除成功');
         this.loadTableData()
       })
     },

@@ -2,7 +2,7 @@
   <div>
     <a-button size="large" class="editable-add-btn" @click="visible = true">
       <a-icon type="plus"/>
-      新增员工
+      新增人员
     </a-button>
     <a-table :loading="loading" :columns="columns" :data-source="data" bordered rowKey="id">
       <template
@@ -35,7 +35,7 @@
         </span>
           <a-popconfirm placement="top" ok-text="Yes" cancel-text="No" @confirm="confirm(record.id)">
             <template slot="title">
-              <p> 删除驾驶员信息后将无法恢复，确定要删除吗？ </p>
+              <p> 删除人员信息后将无法恢复，确定要删除吗？ </p>
             </template>
             <a-button type="link">删除</a-button>
           </a-popconfirm>
@@ -44,28 +44,24 @@
     </a-table>
 
     <a-modal
-        title="Title"
+        title="人员信息"
         :visible="visible"
         @ok="submitForm"
         @cancel="visible = false"
     >
       <a-form-model :model="form">
         <a-form-model-item label="姓名">
-          <a-input v-model="form.name" placeholder="请输入司机姓名"/>
+          <a-input v-model="form.name" placeholder="请输入姓名"/>
         </a-form-model-item>
         <a-form-model-item label="身份证号">
-          <a-input v-model="form.idCard" placeholder="请输入司机身份证信息"/>
+          <a-input v-model="form.idCard" placeholder="请输入身份证信息"/>
         </a-form-model-item>
         <a-form-model-item label="联系方式">
           <a-input v-model="form.phone" placeholder="请输入手机号码"/>
         </a-form-model-item>
-        <a-form-model-item label="所在部门">
-          <a-select v-model="form.department" placeholder="请选择员工所在部门">
-            <a-select-option value="策划部">策划部</a-select-option>
-            <a-select-option value="运输部">运输部</a-select-option>
-            <a-select-option value="销售部">销售部</a-select-option>
-            <a-select-option value="广告部">广告部</a-select-option>
-            <a-select-option value="保卫部">保卫部</a-select-option>
+        <a-form-model-item label="所在中转站">
+          <a-select v-model="form.department" placeholder="请选择人员所在中转站">
+            <a-select-option v-for="(item,index) in warehouseList" :key="item.id || item.name || index" :value="item.name">{{ item.name }}</a-select-option>
           </a-select>
         </a-form-model-item>
         <a-form-model-item label="性别">
@@ -74,7 +70,7 @@
             <a-radio value="女性">女性</a-radio>
           </a-radio-group>
         </a-form-model-item>
-        <a-form-model-item label="家庭住址">
+        <a-form-model-item label="住址">
           <a-input v-model="form.address" type="textarea"/>
         </a-form-model-item>
       </a-form-model>
@@ -85,6 +81,7 @@
 
 <script>
 import {DeleteEmployeeById, FindAllEmployee, SaveEmployee} from "@/api/employee";
+import {FindAllWarehouse} from "../../api/warehouse";
 
 const columns = [
   {
@@ -98,7 +95,7 @@ const columns = [
     scopedSlots: {customRender: 'gender'},
   },
   {
-    title: '所在部门',
+    title: '所在中转站',
     dataIndex: 'department',
     scopedSlots: {customRender: 'department'},
   },
@@ -113,7 +110,7 @@ const columns = [
     scopedSlots: {customRender: 'idCard'},
   },
   {
-    title: '家庭住址',
+    title: '住址',
     dataIndex: 'address',
     scopedSlots: {customRender: 'address'},
   },
@@ -128,6 +125,7 @@ export default {
   data() {
     return {
       loading: false,
+      warehouseList: [],
       form: {
         cacheData: [],
         name: '',
@@ -147,8 +145,16 @@ export default {
     this.loadTableData()
   },
   methods: {
+
+    findAllWarehouse() {
+      FindAllWarehouse().then((res) => {
+        this.warehouseList = res.data
+      })
+    },
+
     loadTableData() {
       this.loading = true
+      this.findAllWarehouse()
       FindAllEmployee().then((res) => {
         if (res.status) {
           this.data = res.data
@@ -159,13 +165,15 @@ export default {
         }, 600)
       })
     },
+
     submitForm() {
       SaveEmployee(this.form).then((res) => {
-        if (res.status) this.$message.success('员工信息提交成功');
+        if (res.status) this.$message.success('人员信息提交成功');
         this.visible = false
         this.loadTableData()
       })
     },
+
     handleChange(value, id, column) {
       const newData = [...this.data];
       const target = newData.filter(item => id === item.id)[0];
@@ -183,6 +191,7 @@ export default {
         this.data = newData;
       }
     },
+
     save(id, index) {
       const newData = [...this.data];
       const newCacheData = [...this.cacheData];

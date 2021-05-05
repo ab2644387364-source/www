@@ -7,10 +7,26 @@ export function FindAllCommodity() {
     })
 }
 
+export function SearchCommodity(name) {
+    return service({
+        url: '/commodity/search/' + name,
+        method: 'get'
+    })
+}
+
+
 export function SaveCommodity(data) {
     return service({
         url: '/commodity',
         method: 'post',
+        data: data
+    })
+}
+
+export function UpdateCommodity(data) {
+    return service({
+        url: '/commodity',
+        method: 'put',
         data: data
     })
 }

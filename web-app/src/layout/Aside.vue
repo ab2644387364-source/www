@@ -1,10 +1,10 @@
 <template>
   <a-layout-sider
       :style="{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }"
-      width="220">
+      width="260">
     <div class="logo">
       <img src="../assets/logo.svg" alt="">
-      物流管理系统
+      牲畜物流转运系统
     </div>
     <a-menu theme="dark" mode="inline">
       <a-sub-menu v-for="(item, index) in menus" :key="index">
@@ -28,47 +28,47 @@ export default {
 
   data() {
     return {
-      menus: [
+      adminMenus: [
         {
-          title: '基础信息管理',
+          title: '牲畜基础管理',
           icon: 'home',
           children: [
-            {title: '商品管理', path: '/commodity'},
-            {title: '来往单位', path: '/company'},
-            {title: '员工管理', path: '/employee'},
-            {title: '仓库管理', path: '/warehouse'},
+            {title: '牲畜档案', path: '/commodity'},
+            {title: '合作单位', path: '/company'},
+            {title: '人员管理', path: '/employee'},
+            {title: '中转站管理', path: '/warehouse'},
           ]
         },
         {
-          title: '销售信息管理',
+          title: '流转记录管理',
           icon: 'pay-circle',
           children: [
-            {title: '销售开票', path: '/sale/create'},
-            {title: '销售记录', path: '/sale/record'},
+            {title: '流转登记', path: '/sale/create'},
+            {title: '流转记录', path: '/sale/record'},
           ]
         },
         {
-          title: '配送信息管理',
+          title: '转运调度管理',
           icon: 'car',
           children: [
-            {title: '申请配送', path: '/delivery/create'},
-            {title: '配送列表', path: '/delivery/list'},
+            {title: '申请转运', path: '/delivery/create'},
+            {title: '转运列表', path: '/delivery/list'},
           ]
         },
         {
-          title: '运输信息管理',
+          title: '运力资源管理',
           icon: 'rocket',
           children: [
             {title: '车辆资料', path: '/vehicle'},
-            {title: '驾驶员资料', path: '/driver'},
+            {title: '押运员资料', path: '/driver'},
           ]
         },
         {
-          title: '系统决策管理',
+          title: '图表分析',
           icon: 'line-chart',
           children: [
-            {title: '入库分析', path: '/analyze/in'},
-            {title: '出库分析', path: '/analyze/out'},
+            {title: '入栏分析', path: '/analyze/in'},
+            {title: '出栏分析', path: '/analyze/out'},
           ]
         },
         {
@@ -84,6 +84,32 @@ export default {
     }
   },
 
+  computed: {
+    menus() {
+      const details = this.$store.state.user.details || {}
+      const role = this.$store.state.user.role || (details.roles ? "admin" : "user")
+      if (role === "admin") return this.adminMenus
+      return [
+        {
+          title: '用户中心',
+          icon: 'profile',
+          children: [
+            {title: '用户信息', path: '/user/profile'},
+          ]
+        },
+        {
+          title: '订单服务',
+          icon: 'shopping-cart',
+          children: [
+            {title: '创建订单', path: '/user/order/create'},
+            {title: '路线查询', path: '/user/route'},
+            {title: '订单支付', path: '/user/pay'},
+          ]
+        },
+      ]
+    }
+  }
+
 }
 
 </script>
@@ -97,6 +123,7 @@ export default {
   margin: 16px;
   color: #ffffff;
   letter-spacing: 2px;
+  white-space: nowrap;
 }
 
 .ant-menu {

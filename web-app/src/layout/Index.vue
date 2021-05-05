@@ -1,7 +1,7 @@
 <template>
   <a-layout id="components-layout-demo-fixed-sider">
     <Aside/>
-    <a-layout :style="{ marginLeft: '220px' }">
+    <a-layout class="content-layout" :style="{ marginLeft: '260px' }">
       <Header/>
       <Main/>
       <Footer/>
@@ -20,8 +20,11 @@ export default {
   components: {Aside, Header, Main, Footer},
 
   mounted() {
+    const details = this.$store.state.user.details || {}
+    const role = this.$store.state.user.role || (details.roles ? "admin" : "user")
+    const title = role === "admin" ? "管理员" : "用户"
     this.$message.success(
-        '欢迎管理员 ' + this.$store.state.user.details.email,
+        '欢迎' + title + ' ' + (details.email || ''),
         6,
     );
   }
@@ -47,6 +50,12 @@ export default {
 
 .header {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+}
+
+.content-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 </style>

@@ -22,7 +22,26 @@ const router = new VueRouter({
 //路由卫士
 router.beforeEach((to, from, next) => {
     NProgress.start()
-    to.meta.auth && !store.state.user.token ? next("/login") : next()
+    if (to.meta.auth && !store.state.user.token) {
+        next("/login")
+        return
+    }
+
+    let role = store.state.user.role
+    if (!role && store.state.user.details && store.state.user.details.roles) {
+        role = "admin"
+        store.commit('user/saveLoginRole', role)
+    }
+
+    if (to.meta.role === "admin" && role !== "admin") {
+        next("/403")
+        return
+    }
+    if (to.meta.role === "user" && role === "admin") {
+        next("/403")
+        return
+    }
+    next()
 })
 
 router.afterEach(() => {

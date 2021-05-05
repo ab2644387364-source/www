@@ -11,8 +11,8 @@
         <a-col :span="8" v-for="(item, index) in this.data" :key="index" class="item">
           <a-card hoverable>
             <template slot="actions" class="ant-card-actions">
-              <a-tag :color=" item.driving ? 'orange': 'green'">{{ item.driving ? '正在途中' : '正在休息' }}</a-tag>
-              <span>使用记录</span>
+              <a-tag :color=" item.driving ? 'orange': 'green'">{{ item.driving ? '在途转运' : '待命' }}</a-tag>
+              <span>运力记录</span>
             </template>
             <a-card-meta
                 :title="'车牌号：' + item.number"
@@ -29,7 +29,7 @@
       </a-row>
     </a-spin>
     <a-modal
-        title="新增仓库"
+        title="新增车辆"
         :visible="visible"
         @ok="submit"
         @cancel="visible = false"

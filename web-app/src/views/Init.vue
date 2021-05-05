@@ -5,26 +5,28 @@
         <img class="logo" src="../assets/logo.svg" alt=""/>
         <div class="box-header-t">系统初始化</div>
       </div>
-      <div class="title">Logistics Management 物流管理系统 - 系统初始化</div>
+      <div class="title">Livestock Transfer 牲畜物流转运系统 - 系统初始化</div>
       <a-input
           v-model="form.email"
           size="large"
           style="margin-top: 10px"
           class="input"
-          placeholder="邮箱">
+          placeholder="邮箱"
+          autocomplete="off">
         <a-icon slot="prefix" type="mail"/>
       </a-input>
       <a-input-password
           v-model="form.password"
           size="large"
           class="input"
-          placeholder="密码">
+          placeholder="密码"
+          autocomplete="new-password">
         <a-icon slot="prefix" type="lock"/>
       </a-input-password>
       <a-button :loading="submitLoading" class="submit-btn" type="primary" @click="submitLogin">
         初始化系统
       </a-button>
-      <div class="des">物流管理系统 - Copyright 2021 高元明</div>
+      <div class="des">牲畜物流转运系统 - Copyright 2026</div>
     </div>
   </div>
 </template>

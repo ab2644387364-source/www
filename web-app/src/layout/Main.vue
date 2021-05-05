@@ -6,4 +6,8 @@
 
 <style scoped>
 
+>>> .ant-layout-content {
+  flex: 1;
+}
+
 </style>
