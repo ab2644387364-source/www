@@ -2,13 +2,23 @@ import request from "axios"
 import {message} from 'ant-design-vue'
 import router from '../router/index'
 
-const token = localStorage.getItem("token")
-
 const service = request.create({
     baseURL: 'http://localhost:8084/api',
     timeout: 50000,
-    headers: {'Authorization': token}
 });
+
+service.interceptors.request.use(
+    config => {
+        const token = localStorage.getItem("token")
+        if (token) {
+            config.headers.Authorization = token
+        } else {
+            delete config.headers.Authorization
+        }
+        return config
+    },
+    error => Promise.reject(error)
+);
 
 service.interceptors.response.use(
     response => {

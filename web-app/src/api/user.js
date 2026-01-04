@@ -23,3 +23,18 @@ export function LoginUser(data) {
     data
   });
 }
+
+export function FindAllUsers() {
+  return request({
+    url: "/admin/users",
+    method: "get"
+  });
+}
+
+export function UpdateUserStatus(id, disabled) {
+  return request({
+    url: `/admin/users/${id}/status`,
+    method: "put",
+    params: {disabled}
+  });
+}

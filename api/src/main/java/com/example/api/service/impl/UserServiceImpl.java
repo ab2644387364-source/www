@@ -10,6 +10,7 @@ import com.example.api.utils.DataTimeUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
@@ -39,7 +40,9 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
+        user.setDisabled(false);
         user.setCreateAt(DataTimeUtil.getNowTimeString());
+        user.setUpdateAt(DataTimeUtil.getNowTimeString());
         return userRepository.save(user);
     }
 
@@ -55,6 +58,25 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new Exception("用户名或密码错误");
         }
+        if (Boolean.TRUE.equals(user.getDisabled())) {
+            throw new Exception("账号已被禁用");
+        }
         return user;
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User updateStatus(String id, boolean disabled) throws Exception {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            throw new Exception("用户不存在");
+        }
+        user.setDisabled(disabled);
+        user.setUpdateAt(DataTimeUtil.getNowTimeString());
+        return userRepository.save(user);
     }
 }

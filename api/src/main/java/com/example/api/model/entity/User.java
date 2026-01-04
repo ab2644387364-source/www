@@ -25,6 +25,8 @@ public class User {
 
     private String password;
 
+    private Boolean disabled;
+
     private String createAt;
 
     private String updateAt;

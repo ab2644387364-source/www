@@ -78,6 +78,7 @@ export default {
             {title: '安全设置', path: '/security'},
             {title: '操作员管理', path: '/admin'},
             {title: '权限列表', path: '/role'},
+            {title: '用户管理', path: '/user-manage'},
           ]
         },
       ]

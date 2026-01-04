@@ -96,6 +96,11 @@ const routes = [
                 meta: {auth: true, role: 'admin'},
             },
             {
+                path: 'user-manage',
+                component: () => import('@/views/system/UserManage'),
+                meta: {auth: true, role: 'admin'},
+            },
+            {
                 path: 'user/profile',
                 component: () => import('@/views/user/Profile'),
                 meta: {auth: true, role: 'user'},
