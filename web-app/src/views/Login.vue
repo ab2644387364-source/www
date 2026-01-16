@@ -1,101 +1,103 @@
 <template>
-  <div class="login-box">
-    <div>
-      <div class="box-header">
-        <img class="logo" src="../assets/logo.svg" alt=""/>
-        <div class="box-header-t">登录</div>
-      </div>
-      <div class="title">牲畜物流转运系统</div>
-      <a-tabs @change="tabClick" default-active-key="1" :tabBarStyle="{ textAlign: 'center' }">
-        <a-tab-pane key="1" tab="用户登录">
-          <a-input
-              v-model="userLogin.email"
-              size="large"
-              style="margin-top: 10px"
-              class="input"
-              placeholder="邮箱"
-              autocomplete="off">
-            <a-icon slot="prefix" type="mail"/>
-          </a-input>
-          <a-input-password
-              v-model="userLogin.password"
-              size="large"
-              class="input"
-              placeholder="密码"
-              autocomplete="new-password">
-            <a-icon slot="prefix" type="lock"/>
-          </a-input-password>
-        </a-tab-pane>
-        <a-tab-pane key="2" tab="用户注册" force-render>
-          <a-input
-              v-model="registerForm.email"
-              size="large"
-              style="margin-top: 10px"
-              class="input"
-              placeholder="邮箱"
-              autocomplete="off">
-            <a-icon slot="prefix" type="mail"/>
-          </a-input>
-          <div style="display: flex">
+  <div id="login-container">
+    <div class="login-box">
+      <div>
+        <div class="box-header">
+          <img class="logo" src="../assets/logo.svg" alt=""/>
+          <div class="box-header-t">登录</div>
+        </div>
+        <div class="title">牲畜物流转运系统</div>
+        <a-tabs @change="tabClick" default-active-key="1" :tabBarStyle="{ textAlign: 'center' }">
+          <a-tab-pane key="1" tab="用户登录">
             <a-input
-                v-model="registerForm.code"
+                v-model="userLogin.email"
+                size="large"
+                style="margin-top: 10px"
+                class="input"
+                placeholder="邮箱"
+                autocomplete="off">
+              <a-icon slot="prefix" type="mail"/>
+            </a-input>
+            <a-input-password
+                v-model="userLogin.password"
                 size="large"
                 class="input"
-                placeholder="验证码"
+                placeholder="密码"
+                autocomplete="new-password">
+              <a-icon slot="prefix" type="lock"/>
+            </a-input-password>
+          </a-tab-pane>
+          <a-tab-pane key="2" tab="用户注册" force-render>
+            <a-input
+                v-model="registerForm.email"
+                size="large"
+                style="margin-top: 10px"
+                class="input"
+                placeholder="邮箱"
                 autocomplete="off">
-              <a-icon slot="prefix" type="safety-certificate"/>
+              <a-icon slot="prefix" type="mail"/>
             </a-input>
-            <a-button class="code-btn" :loading="sendLoading" @click="sendRegisterEmail">
-              获取验证码
-            </a-button>
-          </div>
-          <a-input-password
-              v-model="registerForm.password"
-              size="large"
-              class="input"
-              placeholder="设置密码"
-              autocomplete="new-password">
-            <a-icon slot="prefix" type="lock"/>
-          </a-input-password>
-          <a-input-password
-              v-model="registerForm.confirmPassword"
-              size="large"
-              class="input"
-              placeholder="确认密码"
-              autocomplete="new-password">
-            <a-icon slot="prefix" type="lock"/>
-          </a-input-password>
-        </a-tab-pane>
-        <a-tab-pane key="3" tab="管理员登录" force-render>
-          <a-input
-              v-model="form.email"
-              size="large"
-              style="margin-top: 10px"
-              class="input"
-              placeholder="邮箱"
-              autocomplete="off">
-            <a-icon slot="prefix" type="mail"/>
-          </a-input>
-          <a-input-password
-              v-model="form.password"
-              size="large"
-              class="input"
-              placeholder="密码"
-              autocomplete="new-password">
-            <a-icon slot="prefix" type="lock"/>
-          </a-input-password>
-          <div style="margin-bottom: 20px">
-            <a-checkbox v-model="form.remember">自动登录</a-checkbox>
-            <a-button type="link" style="margin-left: 158px">
-              忘记密码 ?
-            </a-button>
-          </div>
-        </a-tab-pane>
-      </a-tabs>
-      <div class="hint">提示：系统无默认账号和密码，请使用注册账号或初始化管理员账号登录。</div>
-      <a-button :loading="submitLoading" class="submit-btn" type="primary" @click="submitLogin">
-        {{ submitType === '2' ? '确认注册' : '确认登录' }}
-      </a-button>
+            <div style="display: flex">
+              <a-input
+                  v-model="registerForm.code"
+                  size="large"
+                  class="input"
+                  placeholder="验证码"
+                  autocomplete="off">
+                <a-icon slot="prefix" type="safety-certificate"/>
+              </a-input>
+              <a-button class="code-btn" :loading="sendLoading" @click="sendRegisterEmail">
+                获取验证码
+              </a-button>
+            </div>
+            <a-input-password
+                v-model="registerForm.password"
+                size="large"
+                class="input"
+                placeholder="设置密码"
+                autocomplete="new-password">
+              <a-icon slot="prefix" type="lock"/>
+            </a-input-password>
+            <a-input-password
+                v-model="registerForm.confirmPassword"
+                size="large"
+                class="input"
+                placeholder="确认密码"
+                autocomplete="new-password">
+              <a-icon slot="prefix" type="lock"/>
+            </a-input-password>
+          </a-tab-pane>
+          <a-tab-pane key="3" tab="管理员登录" force-render>
+            <a-input
+                v-model="form.email"
+                size="large"
+                style="margin-top: 10px"
+                class="input"
+                placeholder="邮箱"
+                autocomplete="off">
+              <a-icon slot="prefix" type="mail"/>
+            </a-input>
+            <a-input-password
+                v-model="form.password"
+                size="large"
+                class="input"
+                placeholder="密码"
+                autocomplete="new-password">
+              <a-icon slot="prefix" type="lock"/>
+            </a-input-password>
+            <div style="margin-bottom: 20px">
+              <a-checkbox v-model="form.remember">自动登录</a-checkbox>
+              <a-button type="link" style="margin-left: 158px">
+                忘记密码 ?
+              </a-button>
+            </div>
+          </a-tab-pane>
+        </a-tabs>
+        <div class="hint">提示：系统无默认账号和密码，请使用注册账号或初始化管理员账号登录。</div>
+        <a-button :loading="submitLoading" class="submit-btn" type="primary" @click="submitLogin">
+          {{ submitType === '2' ? '确认注册' : '确认登录' }}
+        </a-button>
+      </div>
     </div>
   </div>
 </template>
@@ -259,8 +261,18 @@ export default {
 
 <style scoped>
 
-body {
-  background: #000000 !important;
+#login-container {
+  background: url('../assets/login-background.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 >>> .ant-btn-primary {

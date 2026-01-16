@@ -161,6 +161,53 @@
             保存跟踪信息
           </a-button>
         </div>
+
+        <!-- 物流时间线 -->
+        <div class="timeline-section">
+          <a-divider>物流追踪时间线</a-divider>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-timeline mode="left" v-if="trackRecords.length > 0">
+                <a-timeline-item
+                  v-for="record in trackRecords"
+                  :key="record.id"
+                  :color="getTimelineColor(record.status)"
+                >
+                  <p class="timeline-title">{{ record.node }} - {{ record.status }}</p>
+                  <p class="timeline-desc">{{ record.remark }}</p>
+                  <p class="timeline-time">{{ record.createTime }}</p>
+                </a-timeline-item>
+              </a-timeline>
+              <a-empty v-else description="暂无追踪记录" />
+            </a-col>
+            <a-col :span="12">
+              <a-card title="添加追踪记录" size="small">
+                <a-form-model :model="newTrack" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+                  <a-form-model-item label="节点">
+                    <a-input v-model="newTrack.node" placeholder="如: 检查站A"/>
+                  </a-form-model-item>
+                  <a-form-model-item label="状态">
+                    <a-select v-model="newTrack.status" placeholder="选择状态">
+                      <a-select-option value="到达">到达</a-select-option>
+                      <a-select-option value="离开">离开</a-select-option>
+                      <a-select-option value="装货">装货</a-select-option>
+                      <a-select-option value="卸货">卸货</a-select-option>
+                      <a-select-option value="异常">异常</a-select-option>
+                    </a-select>
+                  </a-form-model-item>
+                  <a-form-model-item label="备注">
+                    <a-input v-model="newTrack.remark" type="textarea" placeholder="补充说明"/>
+                  </a-form-model-item>
+                  <a-form-model-item :wrapper-col="{ span: 16, offset: 6 }">
+                    <a-button type="primary" :loading="addingTrack" @click="addTrackRecord">
+                      添加记录
+                    </a-button>
+                  </a-form-model-item>
+                </a-form-model>
+              </a-card>
+            </a-col>
+          </a-row>
+        </div>
       </div>
 
     </a-modal>
@@ -170,6 +217,7 @@
 
 <script>
 import {FindAllDistribution, SaveDistribution} from "../../api/distribution";
+import {GetTrackRecords, AddTrackRecord} from "../../api/notification";
 
 const columns = [
   {
@@ -258,6 +306,13 @@ export default {
       data: [],
       columns,
       editingKey: '',
+      trackRecords: [],
+      addingTrack: false,
+      newTrack: {
+        node: '',
+        status: undefined,
+        remark: ''
+      }
     };
   },
   mounted() {
@@ -332,6 +387,8 @@ export default {
     review(index) {
       this.select = this.data[index]
       this.visible2 = true
+      this.trackRecords = []
+      this.loadTrackRecords()
     },
 
     agree() {
@@ -353,6 +410,41 @@ export default {
         this.saving = false
         this.loadTableData()
       })
+    },
+
+    loadTrackRecords() {
+      if (this.select.id) {
+        GetTrackRecords(this.select.id).then((res) => {
+          this.trackRecords = res || []
+        })
+      }
+    },
+
+    addTrackRecord() {
+      if (!this.newTrack.node || !this.newTrack.status) {
+        this.$message.warning('请填写节点和状态')
+        return
+      }
+      this.addingTrack = true
+      AddTrackRecord(this.select.id, this.newTrack).then((res) => {
+        this.$message.success('追踪记录已添加')
+        this.newTrack = { node: '', status: undefined, remark: '' }
+        this.loadTrackRecords()
+        this.addingTrack = false
+      }).catch(() => {
+        this.addingTrack = false
+      })
+    },
+
+    getTimelineColor(status) {
+      const colors = {
+        '到达': 'green',
+        '离开': 'blue',
+        '装货': 'orange',
+        '卸货': 'purple',
+        '异常': 'red'
+      }
+      return colors[status] || 'gray'
     },
 
   },
@@ -382,5 +474,26 @@ export default {
 
 .check p {
   padding-bottom: 20px;
+}
+
+.timeline-section {
+  margin-top: 24px;
+}
+
+.timeline-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.timeline-desc {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.timeline-time {
+  color: #999;
+  font-size: 12px;
 }
 </style>

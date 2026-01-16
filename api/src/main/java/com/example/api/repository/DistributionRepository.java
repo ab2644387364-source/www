@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DistributionRepository extends JpaRepository<Distribution, String> {
+
+    long countByStatus(Integer status);
+
+    long countByWarningLevelGreaterThan(Integer level);
 }
