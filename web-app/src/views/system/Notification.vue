@@ -65,7 +65,11 @@ export default {
     loadData() {
       this.loading = true
       GetNotifications().then(res => {
-        this.notifications = res || []
+        if (res.status && res.data) {
+          this.notifications = res.data
+        } else {
+          this.notifications = []
+        }
         this.loading = false
       }).catch(() => {
         this.loading = false

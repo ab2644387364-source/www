@@ -10,4 +10,6 @@ public interface DistributionRepository extends JpaRepository<Distribution, Stri
     long countByStatus(Integer status);
 
     long countByWarningLevelGreaterThan(Integer level);
+
+    Distribution findByOrderNo(String orderNo);
 }

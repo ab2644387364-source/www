@@ -2,6 +2,7 @@ package com.example.api.controller;
 
 import com.example.api.model.entity.Distribution;
 import com.example.api.model.entity.TrackRecord;
+import com.example.api.repository.DistributionRepository;
 import com.example.api.repository.DriverRepository;
 import com.example.api.repository.VehicleRepository;
 import com.example.api.service.DistributionService;
@@ -19,6 +20,9 @@ public class DistributionController {
 
     @Resource
     private DistributionService distributionService;
+
+    @Resource
+    private DistributionRepository distributionRepository;
 
     @Resource
     private DriverRepository driverRepository;
@@ -45,6 +49,27 @@ public class DistributionController {
         map.put("drivers", driverRepository.findAll());
         map.put("vehicles", vehicleRepository.findAll());
         return map;
+    }
+
+    /**
+     * 根据订单号查询路线信息
+     */
+    @GetMapping("/route")
+    public Map<String, Object> queryRoute(@RequestParam String orderNo) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("distribution", null);
+        result.put("trackRecords", List.of());
+        if (orderNo == null || orderNo.trim().isEmpty()) {
+            return result;
+        }
+        Distribution distribution = distributionRepository.findByOrderNo(orderNo.trim());
+        if (distribution == null) {
+            return result;
+        }
+        List<TrackRecord> records = trackRecordService.findByDistributionId(distribution.getId());
+        result.put("distribution", distribution);
+        result.put("trackRecords", records);
+        return result;
     }
 
     /**

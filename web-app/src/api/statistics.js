@@ -1,4 +1,4 @@
-import request from './portal'
+import request from '../utils/request'
 
 // 获取所有仪表盘数据
 export function GetDashboard() {

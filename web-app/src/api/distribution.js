@@ -21,3 +21,11 @@ export function SaveDistribution(data) {
         data: data
     })
 }
+
+export function QueryRouteByOrder(orderNo) {
+    return service({
+        url: '/distribution/route',
+        method: 'get',
+        params: { orderNo }
+    })
+}

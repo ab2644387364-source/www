@@ -24,7 +24,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User register(RegisterUserDto dto) throws Exception {
-        if (dto.getEmail() == null || !Pattern.matches("^\\w{3,}(\\.\\w+)*@[A-Za-z0-9]+(\\.[A-Za-z]{2,5}){1,2}$", dto.getEmail())) {
+        if (dto.getEmail() == null
+                || !Pattern.matches("^\\w{3,}(\\.\\w+)*@[A-Za-z0-9]+(\\.[A-Za-z]{2,5}){1,2}$", dto.getEmail())) {
             throw new Exception("邮箱格式不正确");
         }
         if (dto.getPassword() == null || dto.getPassword().length() < 6) {
@@ -48,7 +49,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(LoginDto dto) throws Exception {
-        if (dto.getEmail() == null || !Pattern.matches("^\\w{3,}(\\.\\w+)*@[A-Za-z0-9]+(\\.[A-Za-z]{2,5}){1,2}$", dto.getEmail())) {
+        if (dto.getEmail() == null
+                || !Pattern.matches("^\\w{3,}(\\.\\w+)*@[A-Za-z0-9]+(\\.[A-Za-z]{2,5}){1,2}$", dto.getEmail())) {
             throw new Exception("邮箱格式不正确");
         }
         if (dto.getPassword() == null || dto.getPassword().length() < 6) {
@@ -78,5 +80,54 @@ public class UserServiceImpl implements UserService {
         user.setDisabled(disabled);
         user.setUpdateAt(DataTimeUtil.getNowTimeString());
         return userRepository.save(user);
+    }
+
+    @Override
+    public User findByEmail(String email) throws Exception {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new Exception("用户不存在");
+        }
+        return user;
+    }
+
+    @Override
+    public User updateProfile(String email, User updateUser) throws Exception {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new Exception("用户不存在");
+        }
+        // 更新用户信息（只更新个人信息字段，不更新邮箱和密码）
+        if (updateUser.getName() != null) {
+            user.setName(updateUser.getName());
+        }
+        if (updateUser.getPhone() != null) {
+            user.setPhone(updateUser.getPhone());
+        }
+        if (updateUser.getAddress() != null) {
+            user.setAddress(updateUser.getAddress());
+        }
+        if (updateUser.getCompany() != null) {
+            user.setCompany(updateUser.getCompany());
+        }
+        user.setUpdateAt(DataTimeUtil.getNowTimeString());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void changePassword(String email, String oldPassword, String newPassword) throws Exception {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new Exception("用户不存在");
+        }
+        if (!user.getPassword().equals(oldPassword)) {
+            throw new Exception("原密码错误");
+        }
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new Exception("新密码长度至少6位");
+        }
+        user.setPassword(newPassword);
+        user.setUpdateAt(DataTimeUtil.getNowTimeString());
+        userRepository.save(user);
     }
 }

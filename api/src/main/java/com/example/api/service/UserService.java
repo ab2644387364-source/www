@@ -16,4 +16,10 @@ public interface UserService {
 
     User updateStatus(String id, boolean disabled) throws Exception;
 
+    User findByEmail(String email) throws Exception;
+
+    User updateProfile(String email, User updateUser) throws Exception;
+
+    void changePassword(String email, String oldPassword, String newPassword) throws Exception;
+
 }

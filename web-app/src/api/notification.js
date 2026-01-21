@@ -1,4 +1,4 @@
-import request from './portal'
+import request from '../utils/request'
 
 // 获取所有通知
 export function GetNotifications() {

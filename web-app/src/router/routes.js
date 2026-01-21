@@ -108,7 +108,7 @@ const routes = [
             {
                 path: 'notification',
                 component: () => import('@/views/system/Notification'),
-                meta: { auth: true, role: 'admin' },
+                meta: { auth: true },
             },
             {
                 path: 'user/profile',

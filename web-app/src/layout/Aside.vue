@@ -6,29 +6,57 @@
       <img src="../assets/logo.svg" alt="">
       牲畜物流转运系统
     </div>
-    <a-menu theme="dark" mode="inline">
-      <a-sub-menu v-for="(item, index) in menus" :key="index">
-        <span slot="title">
-          <a-icon :type="item.icon"/>
-          <span>{{ item.title }}</span>
-        </span>
-        <a-menu-item v-for="menu in item.children" :key="menu.title">
-          <router-link :to="menu.path">
-            {{ menu.title }}
+    <a-menu 
+      theme="dark" 
+      mode="inline"
+      :open-keys="openKeys"
+      :selected-keys="selectedKeys"
+      @openChange="onOpenChange"
+    >
+      <template v-for="(item, index) in menus">
+        <!-- 独立菜单项（无子菜单） -->
+        <a-menu-item v-if="item.standalone" :key="item.path">
+          <router-link :to="item.path">
+            <a-badge :count="item.badge || 0" :offset="[10, 0]">
+              <a-icon :type="item.icon" style="color: rgba(255,255,255,0.65)"/>
+            </a-badge>
+            <span style="margin-left: 10px">{{ item.title }}</span>
           </router-link>
         </a-menu-item>
-      </a-sub-menu>
+        <!-- 子菜单 -->
+        <a-sub-menu v-else :key="String(index)">
+          <span slot="title">
+            <a-icon :type="item.icon"/>
+            <span>{{ item.title }}</span>
+          </span>
+          <a-menu-item v-for="menu in item.children" :key="menu.path">
+            <router-link :to="menu.path">
+              {{ menu.title }}
+            </router-link>
+          </a-menu-item>
+        </a-sub-menu>
+      </template>
     </a-menu>
   </a-layout-sider>
 </template>
 
 <script>
+import { GetUnreadCount } from '@/api/notification'
 
 export default {
 
   data() {
     return {
+      openKeys: [],
+      unreadCount: 0,
       adminMenus: [
+        {
+          title: '仪表盘',
+          icon: 'dashboard',
+          children: [
+            {title: '概览', path: '/dashboard'},
+          ]
+        },
         {
           title: '牲畜基础管理',
           icon: 'home',
@@ -89,7 +117,19 @@ export default {
     menus() {
       const details = this.$store.state.user.details || {}
       const role = this.$store.state.user.role || (details.roles ? "admin" : "user")
-      if (role === "admin") return this.adminMenus
+      if (role === "admin") {
+        // 管理员菜单：在最后添加独立的消息中心
+        return [
+          ...this.adminMenus,
+          {
+            title: '消息中心',
+            icon: 'bell',
+            path: '/notification',
+            standalone: true,
+            badge: this.unreadCount
+          }
+        ]
+      }
       return [
         {
           title: '用户中心',
@@ -107,7 +147,75 @@ export default {
             {title: '订单支付', path: '/user/pay'},
           ]
         },
+        {
+          title: '消息通知',
+          icon: 'bell',
+          path: '/notification',
+          standalone: true,
+          badge: this.unreadCount
+        },
       ]
+    },
+    selectedKeys() {
+      // 根据当前路由路径返回选中的菜单项
+      const path = this.$route.path
+      return [path]
+    }
+  },
+
+  watch: {
+    // 监听路由变化，自动展开对应菜单
+    '$route.path': {
+      immediate: true,
+      handler(path) {
+        this.updateOpenKeys(path)
+        // 进入通知页面时刷新未读数
+        if (path === '/notification') {
+          this.loadUnreadCount()
+        }
+      }
+    }
+  },
+
+  mounted() {
+    this.loadUnreadCount()
+    // 每30秒刷新一次未读数
+    this.unreadTimer = setInterval(() => {
+      this.loadUnreadCount()
+    }, 30000)
+  },
+
+  beforeDestroy() {
+    if (this.unreadTimer) {
+      clearInterval(this.unreadTimer)
+    }
+  },
+
+  methods: {
+    loadUnreadCount() {
+      GetUnreadCount().then(res => {
+        if (res.status && res.data) {
+          this.unreadCount = res.data.count || 0
+        }
+      }).catch(() => {
+        // 忽略错误
+      })
+    },
+    updateOpenKeys(path) {
+      // 根据当前路径找到对应的父级菜单索引
+      for (let i = 0; i < this.menus.length; i++) {
+        const menu = this.menus[i]
+        if (menu.standalone) continue
+        const found = menu.children && menu.children.some(child => child.path === path)
+        if (found) {
+          this.openKeys = [String(i)]
+          return
+        }
+      }
+    },
+    onOpenChange(keys) {
+      // 手动展开/收起菜单时更新
+      this.openKeys = keys
     }
   }
 

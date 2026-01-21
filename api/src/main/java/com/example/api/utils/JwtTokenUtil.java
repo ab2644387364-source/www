@@ -9,13 +9,13 @@ import java.util.*;
 
 public final class JwtTokenUtil {
 
-    //在http header中的名字
+    // 在http header中的名字
     public final static String TOKEN_HEADER = "Authorization";
 
-    //一个星期过期
+    // 一个星期过期
     public final static long REMEMBER_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7;
 
-    //一天过期
+    // 一天过期
     public final static long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
     // 应用密钥
@@ -26,9 +26,10 @@ public final class JwtTokenUtil {
     // 角色权限声明
     private static final String ROLE_CLAIMS = "roles";
 
-    //检验token是否合法
+    // 检验token是否合法
     public static boolean checkToken(String token) {
-        if ("null".equals(token) || token == null || "".equals(token)) return false;
+        if ("null".equals(token) || token == null || "".equals(token))
+            return false;
         return token.startsWith(PREFIX);
     }
 
@@ -39,8 +40,8 @@ public final class JwtTokenUtil {
         Map<String, Object> map = new HashMap<>();
         map.put(ROLE_CLAIMS, roles);
         return PREFIX + Jwts.builder()
-                .setSubject(username)
                 .setClaims(map)
+                .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS256, APP_SECRET)
@@ -93,4 +94,3 @@ public final class JwtTokenUtil {
     }
 
 }
-

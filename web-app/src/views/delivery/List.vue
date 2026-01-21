@@ -12,7 +12,7 @@
         <a-tag v-else color="#52c41a">正常</a-tag>
       </span>
       <template
-          v-for="col in ['phone','address','routePlan','currentNode']"
+          v-for="col in ['orderNo','phone','address','routePlan','currentNode']"
           :slot="col"
           slot-scope="text, record, index"
       >
@@ -100,6 +100,7 @@
         <div v-if="select.status === 0" class="check">
           <p>押运员： {{ select.driver }}</p>
           <p>车牌号码： {{ select.number }}</p>
+          <p>Order No: {{ select.orderNo }}</p>
           <p>起点： {{ select.origin }}</p>
           <p>目的地： {{ select.destination }}</p>
           <p>加急处理： {{ select.urgent }}</p>
@@ -229,6 +230,11 @@ const columns = [
     title: '车牌号',
     dataIndex: 'number',
     scopedSlots: {customRender: 'number'},
+  },
+  {
+    title: 'Order No',
+    dataIndex: 'orderNo',
+    scopedSlots: {customRender: 'orderNo'},
   },
   {
     title: '起点',

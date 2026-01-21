@@ -33,7 +33,8 @@ public class UserController {
     public java.util.Map<String, Object> login(@RequestBody LoginDto dto) throws Exception {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         User user = userService.login(dto);
-        String token = JwtTokenUtil.createToken(user.getEmail(), new String[]{"ROLE_USER"}, JwtTokenUtil.EXPIRATION_TIME);
+        String token = JwtTokenUtil.createToken(user.getEmail(), new String[] { "ROLE_USER" },
+                JwtTokenUtil.EXPIRATION_TIME);
         map.put("user", user);
         map.put("token", token);
         return map;
@@ -42,6 +43,36 @@ public class UserController {
     @GetMapping("/sendEmail")
     public void sendEmail(String email) throws Exception {
         emailService.sendVerificationCode(email);
+    }
+
+    @GetMapping("/profile")
+    public User getProfile(
+            @org.springframework.web.bind.annotation.RequestHeader("Authorization") String token)
+            throws Exception {
+        String email = JwtTokenUtil.getUsername(token.replace("Bearer ", ""));
+        return userService.findByEmail(email);
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/profile")
+    public User updateProfile(
+            @org.springframework.web.bind.annotation.RequestHeader("Authorization") String token,
+            @RequestBody User updateUser) throws Exception {
+        String email = JwtTokenUtil.getUsername(token.replace("Bearer ", ""));
+        return userService.updateProfile(email, updateUser);
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/password")
+    public java.util.Map<String, Object> changePassword(
+            @org.springframework.web.bind.annotation.RequestHeader("Authorization") String token,
+            @RequestBody java.util.Map<String, String> body) throws Exception {
+        String email = JwtTokenUtil.getUsername(token.replace("Bearer ", ""));
+        String oldPassword = body.get("oldPassword");
+        String newPassword = body.get("newPassword");
+        userService.changePassword(email, oldPassword, newPassword);
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("success", true);
+        result.put("message", "密码修改成功");
+        return result;
     }
 
 }

@@ -25,6 +25,14 @@ public class User {
 
     private String password;
 
+    private String name;
+
+    private String phone;
+
+    private String address;
+
+    private String company;
+
     private Boolean disabled;
 
     private String createAt;

@@ -28,6 +28,9 @@
               </a-select-option>
             </a-select>
           </a-form-model-item>
+          <a-form-model-item label="Order No" required>
+            <a-input v-model="form.orderNo" placeholder="e.g. OD20250101001"/>
+          </a-form-model-item>
           <a-form-model-item label="起点" required>
             <a-input v-model="form.origin" placeholder="如：养殖场A"/>
           </a-form-model-item>
@@ -81,6 +84,7 @@
       <div v-if="current === 1" class="check">
         <p>押运员： {{ form.driver }}</p>
         <p>车牌号码： {{ form.number }}</p>
+        <p>Order No: {{ form.orderNo }}</p>
         <p>起点： {{ form.origin }}</p>
         <p>目的地： {{ form.destination }}</p>
         <p>路线规划： {{ form.routePlan }}</p>
@@ -136,6 +140,7 @@ export default {
         vid: '',
         driver: '',
         number: '',
+        orderNo: '',
         phone: '',
         address: '',
         origin: '',

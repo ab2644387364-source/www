@@ -2,19 +2,26 @@ server:
   port: 8084
 spring:
   mail:
-    host: smtp.163.com
-    protocol: smtp
+    host: smtp.qq.com
+    port: 465
     default-encoding: UTF-8
     #发件人
-
-    username: gaoyuanming_1@163.com
-    #授权码
-    password: a123456
+    username: 2644387364@qq.com
+    #授权码（请替换为你的QQ邮箱授权码）
+    password: jfvrrgzxmoalecch
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.150.103:3306/a?characterEncoding=utf8&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/a?characterEncoding=utf8&serverTimezone=UTC
     username: root
-    password: 123321
+    password: 123456
   jpa:
     hibernate:
       ddl-auto: update

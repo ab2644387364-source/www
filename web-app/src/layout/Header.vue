@@ -14,13 +14,18 @@
       <a-button class="reload-btn" icon="question-circle" type="link"/>
     </a-tooltip>
 
+    <!-- 通知铃铛 -->
+    <a-badge :count="unreadCount" class="notification-badge">
+      <a-button class="notification-btn" icon="bell" type="link" @click="goNotification"/>
+    </a-badge>
+
     <a-dropdown>
       <a-button class="avatar-btn" type="link">
         <div class="avatar-btn-main">
           <a-avatar class="avatar"
                     :size="26"
                     src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"/>
-          <div class="avatar-btn-username">{{ details.email }}</div>
+          <div class="avatar-btn-username">{{ displayName }}</div>
         </div>
       </a-button>
       <a-menu slot="overlay">
@@ -48,10 +53,13 @@
 </template>
 
 <script>
+import { GetUnreadCount } from '../api/notification'
+
 export default {
 
   data() {
     return {
+      unreadCount: 0
     }
   },
 
@@ -69,10 +77,48 @@ export default {
     },
     profileLabel() {
       return this.isAdmin ? "个人中心" : "用户信息"
+    },
+    displayName() {
+      // 优先显示姓名，没有姓名时显示邮箱的脱敏形式
+      if (this.details.name) {
+        return this.details.name
+      }
+      const email = this.details.email || ''
+      if (email.includes('@')) {
+        const [name, domain] = email.split('@')
+        return name.slice(0, 3) + '***@' + domain
+      }
+      return '用户'
+    }
+  },
+
+  mounted() {
+    this.loadUnreadCount()
+    // 每30秒刷新一次未读数量
+    this.timer = setInterval(() => {
+      this.loadUnreadCount()
+    }, 30000)
+  },
+
+  beforeDestroy() {
+    if (this.timer) {
+      clearInterval(this.timer)
     }
   },
 
   methods: {
+
+    loadUnreadCount() {
+      GetUnreadCount().then(res => {
+        this.unreadCount = res.count || 0
+      }).catch(() => {
+        this.unreadCount = 0
+      })
+    },
+
+    goNotification() {
+      this.$router.push('/notification')
+    },
 
     clickReload() {
       this.$router.go(0)
@@ -106,6 +152,20 @@ export default {
 .question-btn {
   float: right;
   margin: 15px 12px 0 0;
+}
+
+.notification-badge {
+  float: right;
+  margin: 18px 16px 0 0;
+}
+
+.notification-btn {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.notification-btn:hover {
+  color: #1890ff;
 }
 
 .avatar-btn {

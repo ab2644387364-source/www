@@ -39,6 +39,9 @@ public class Distribution {
     //客户地址
     private String address;
 
+    //关联订单号
+    private String orderNo;
+
     //起点
     private String origin;
 
