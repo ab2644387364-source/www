@@ -1,0 +1,51 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.example:api >---------------------------
+[INFO] Building api 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.2.0:resources (default-resources) @ api ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 116 source files to D:\wuliu\a\api\target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/wuliu/a/api/src/main/java/com/example/api/handler/GlobalExceptionHandler.java:[22,24] 程序包javax.validation不存在
+[ERROR] /D:/wuliu/a/api/src/main/java/com/example/api/handler/GlobalExceptionHandler.java:[23,24] 程序包javax.validation不存在
+[ERROR] /D:/wuliu/a/api/src/main/java/com/example/api/handler/GlobalExceptionHandler.java:[100,65] 找不到符号
+  符号:   类 ConstraintViolationException
+  位置: 类 com.example.api.handler.GlobalExceptionHandler
+[ERROR] /D:/wuliu/a/api/src/main/java/com/example/api/handler/GlobalExceptionHandler.java:[98,23] 找不到符号
+  符号:   类 ConstraintViolationException
+  位置: 类 com.example.api.handler.GlobalExceptionHandler
+[INFO] 4 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.515 s
+[INFO] Finished at: 2026-02-07T13:00:27+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.8.1:compile (default-compile) on project api: Compilation failure: Compilation failure: 
+[ERROR] /D:/wuliu/a/api/src/main/java/com/example/api/handler/GlobalExceptionHandler.java:[22,24] 程序包javax.validation不存在
+[ERROR] /D:/wuliu/a/api/src/main/java/com/example/api/handler/GlobalExceptionHandler.java:[23,24] 程序包javax.validation不存在
+[ERROR] /D:/wuliu/a/api/src/main/java/com/example/api/handler/GlobalExceptionHandler.java:[100,65] 找不到符号
+[ERROR]   符号:   类 ConstraintViolationException
+[ERROR]   位置: 类 com.example.api.handler.GlobalExceptionHandler
+[ERROR] /D:/wuliu/a/api/src/main/java/com/example/api/handler/GlobalExceptionHandler.java:[98,23] 找不到符号
+[ERROR]   符号:   类 ConstraintViolationException
+[ERROR]   位置: 类 com.example.api.handler.GlobalExceptionHandler
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

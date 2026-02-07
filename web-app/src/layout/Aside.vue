@@ -41,7 +41,8 @@
 </template>
 
 <script>
-import { GetUnreadCount } from '@/api/notification'
+import { GetUnreadCount, GetUserUnreadCount } from '@/api/notification'
+import { eventBus } from '@/utils/eventBus'
 
 export default {
 
@@ -76,11 +77,26 @@ export default {
           ]
         },
         {
+          title: '订单管理',
+          icon: 'audit',
+          children: [
+            {title: '订单审核', path: '/order/manage'},
+          ]
+        },
+        {
+          title: '库存管理',
+          icon: 'database',
+          children: [
+            {title: '库存监控', path: '/inventory/manage'},
+          ]
+        },
+        {
           title: '转运调度管理',
           icon: 'car',
           children: [
             {title: '申请转运', path: '/delivery/create'},
             {title: '转运列表', path: '/delivery/list'},
+            {title: '实时轨迹追踪', path: '/tracking/map'},
           ]
         },
         {
@@ -97,6 +113,13 @@ export default {
           children: [
             {title: '入栏分析', path: '/analyze/in'},
             {title: '出栏分析', path: '/analyze/out'},
+          ]
+        },
+        {
+          title: '报表中心',
+          icon: 'file-excel',
+          children: [
+            {title: '报表导出', path: '/report/center'},
           ]
         },
         {
@@ -142,15 +165,36 @@ export default {
           title: '订单服务',
           icon: 'shopping-cart',
           children: [
+            {title: '我的订单', path: '/user/orders'},
             {title: '创建订单', path: '/user/order/create'},
-            {title: '路线查询', path: '/user/route'},
+            {title: '运费估算', path: '/user/freight'},
+            {title: '物流轨迹', path: '/user/tracking'},
             {title: '订单支付', path: '/user/pay'},
+          ]
+        },
+        {
+          title: '数据统计',
+          icon: 'bar-chart',
+          children: [
+            {title: '数据概览', path: '/user/dashboard'},
+            {title: '运输报告', path: '/user/report'},
+            {title: '消费分析', path: '/user/expense'},
+          ]
+        },
+        {
+          title: '客服中心',
+          icon: 'customer-service',
+          children: [
+            {title: '客服首页', path: '/support'},
+            {title: '常见问题', path: '/support/faq'},
+            {title: '投诉建议', path: '/support/feedback'},
+            {title: '联系我们', path: '/support/contact'},
           ]
         },
         {
           title: '消息通知',
           icon: 'bell',
-          path: '/notification',
+          path: '/user/notification',
           standalone: true,
           badge: this.unreadCount
         },
@@ -183,23 +227,40 @@ export default {
     this.unreadTimer = setInterval(() => {
       this.loadUnreadCount()
     }, 30000)
+    // 监听标记已读事件，立即刷新未读数
+    eventBus.$on('notification-read', this.loadUnreadCount)
   },
 
   beforeDestroy() {
     if (this.unreadTimer) {
       clearInterval(this.unreadTimer)
     }
+    eventBus.$off('notification-read', this.loadUnreadCount)
   },
 
   methods: {
     loadUnreadCount() {
-      GetUnreadCount().then(res => {
-        if (res.status && res.data) {
-          this.unreadCount = res.data.count || 0
+      const details = this.$store.state.user.details || {}
+      const role = this.$store.state.user.role || (details.roles ? "admin" : "user")
+      
+      if (role === "admin") {
+        // 管理员：获取所有未读
+        GetUnreadCount().then(res => {
+          if (res.status && res.data) {
+            this.unreadCount = res.data.count || 0
+          }
+        }).catch(() => {})
+      } else {
+        // 普通用户：获取用户自己的未读
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        if (user.id) {
+          GetUserUnreadCount(user.id).then(res => {
+            if (res.status && res.data) {
+              this.unreadCount = res.data.count || 0
+            }
+          }).catch(() => {})
         }
-      }).catch(() => {
-        // 忽略错误
-      })
+      }
     },
     updateOpenKeys(path) {
       // 根据当前路径找到对应的父级菜单索引

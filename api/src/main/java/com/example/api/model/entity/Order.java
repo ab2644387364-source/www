@@ -35,6 +35,18 @@ public class Order {
     // 目的地
     private String destination;
 
+    // 发货人联系人
+    private String fromContact;
+
+    // 发货人电话
+    private String fromPhone;
+
+    // 收货人联系人
+    private String toContact;
+
+    // 收货人电话
+    private String toPhone;
+
     // 货物类型
     private String type;
 

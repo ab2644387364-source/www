@@ -49,6 +49,7 @@
 
 <script>
 import { GetNotifications, MarkAsRead, MarkAllAsRead } from '../../api/notification'
+import { eventBus } from '@/utils/eventBus'
 
 export default {
   name: 'Notification',
@@ -80,6 +81,7 @@ export default {
         const item = this.notifications.find(n => n.id === id)
         if (item) item.isRead = true
         this.$message.success('已标记为已读')
+        eventBus.$emit('notification-read')
       })
     },
     markAllRead() {
@@ -88,6 +90,7 @@ export default {
         this.notifications.forEach(n => n.isRead = true)
         this.$message.success('已全部标记为已读')
         this.loading = false
+        eventBus.$emit('notification-read')
       }).catch(() => {
         this.loading = false
       })

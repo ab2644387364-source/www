@@ -29,13 +29,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        //开启跨域
+        // 开启跨域
         http.csrf().disable().cors();
 
-        //禁用session
+        // 禁用session
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        //添加自定义的jwt过滤器
+        // 添加自定义的jwt过滤器
         http.addFilter(new JwtAuthorizationFilter(authenticationManagerBean()));
 
     }
@@ -51,9 +51,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.addAllowedHeader("DELETE");
         corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.addAllowedOrigin("*");
+        // 生产环境请替换为实际的前端域名，如 https://your-domain.com
+        corsConfiguration.addAllowedOrigin("http://localhost:8080");
+        corsConfiguration.addAllowedOrigin("http://127.0.0.1:8080");
+        // 允许携带凭证（如 cookies）
+        corsConfiguration.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }

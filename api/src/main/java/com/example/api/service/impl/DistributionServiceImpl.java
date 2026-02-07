@@ -9,6 +9,7 @@ import com.example.api.repository.DriverRepository;
 import com.example.api.repository.OrderRepository;
 import com.example.api.repository.VehicleRepository;
 import com.example.api.service.DistributionService;
+import com.example.api.service.NotificationService;
 import com.example.api.utils.DataTimeUtil;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,9 @@ public class DistributionServiceImpl implements DistributionService {
     @Resource
     private OrderRepository orderRepository;
 
+    @Resource
+    private NotificationService notificationService;
+
     @Override
     public Distribution save(Distribution distribution) throws Exception {
         Distribution existing = null;
@@ -50,22 +54,26 @@ public class DistributionServiceImpl implements DistributionService {
         boolean hasDid = did != null && !did.trim().isEmpty();
         boolean hasVid = vid != null && !vid.trim().isEmpty();
         if (hasDid != hasVid) {
-            throw new Exception("Ë¾»úºÍ³µÁ¾±ØĞëÍ¬Ê±Ö¸¶¨");
+            throw new Exception("å¸æœºå’Œè½¦è¾†å¿…é¡»åŒæ—¶æŒ‡å®š");
         }
 
         if (hasDid) {
             if (isNew) {
                 Optional<Driver> driver = driverRepository.findById(did);
                 Optional<Vehicle> vehicle = vehicleRepository.findById(vid);
-                if (driver.isEmpty() || vehicle.isEmpty()) throw new Exception("ÇëÇó²ÎÊı´íÎó");
-                if (driver.get().isDriving() || vehicle.get().isDriving()) throw new Exception("Ë¾»ú»ò³µÁ¾×´Ì¬²»¿ÉÓÃ");
+                if (driver.isEmpty() || vehicle.isEmpty())
+                    throw new Exception("è¯·æ±‚å‚æ•°é”™è¯¯");
+                if (driver.get().isDriving() || vehicle.get().isDriving())
+                    throw new Exception("å¸æœºæˆ–è½¦è¾†çŠ¶æ€ä¸å¯ç”¨");
                 driverRepository.updateDriving(true, did);
                 vehicleRepository.updateDriving(true, vid);
             } else {
                 if (existing != null && !did.equals(existing.getDid())) {
                     Optional<Driver> driver = driverRepository.findById(did);
-                    if (driver.isEmpty()) throw new Exception("ÇëÇó²ÎÊı´íÎó");
-                    if (driver.get().isDriving()) throw new Exception("Ë¾»ú×´Ì¬²»¿ÉÓÃ");
+                    if (driver.isEmpty())
+                        throw new Exception("è¯·æ±‚å‚æ•°é”™è¯¯");
+                    if (driver.get().isDriving())
+                        throw new Exception("å¸æœºçŠ¶æ€ä¸å¯ç”¨");
                     if (existing.getDid() != null && !existing.getDid().trim().isEmpty()) {
                         driverRepository.updateDriving(false, existing.getDid());
                     }
@@ -73,8 +81,10 @@ public class DistributionServiceImpl implements DistributionService {
                 }
                 if (existing != null && !vid.equals(existing.getVid())) {
                     Optional<Vehicle> vehicle = vehicleRepository.findById(vid);
-                    if (vehicle.isEmpty()) throw new Exception("ÇëÇó²ÎÊı´íÎó");
-                    if (vehicle.get().isDriving()) throw new Exception("³µÁ¾×´Ì¬²»¿ÉÓÃ");
+                    if (vehicle.isEmpty())
+                        throw new Exception("è¯·æ±‚å‚æ•°é”™è¯¯");
+                    if (vehicle.get().isDriving())
+                        throw new Exception("è½¦è¾†çŠ¶æ€ä¸å¯ç”¨");
                     if (existing.getVid() != null && !existing.getVid().trim().isEmpty()) {
                         vehicleRepository.updateDriving(false, existing.getVid());
                     }
@@ -106,20 +116,29 @@ public class DistributionServiceImpl implements DistributionService {
         }
         Integer distStatus = distribution.getStatus();
         Integer targetStatus = null;
+        String statusMessage = null;
         if (distStatus != null) {
             if (distStatus == 1 && order.getStatus() == 1) {
                 targetStatus = 2;
+                statusMessage = "æ‚¨çš„è®¢å•å·²å¼€å§‹è¿è¾“";
             } else if (distStatus == 2 && (order.getStatus() == 1 || order.getStatus() == 2)) {
                 targetStatus = 3;
+                statusMessage = "æ‚¨çš„è®¢å•å·²é€è¾¾";
             }
         }
         if (targetStatus != null) {
+            Integer oldStatus = order.getStatus();
             order.setStatus(targetStatus);
             order.setUpdateAt(DataTimeUtil.getNowTimeString());
             orderRepository.save(order);
+
+            // å‘é€é€šçŸ¥ç»™ç”¨æˆ·
+            if (order.getUserId() != null && statusMessage != null) {
+                String title = "è®¢å•çŠ¶æ€æ›´æ–°";
+                String content = String.format("%s (è®¢å•å·: %s)", statusMessage, order.getOrderNo());
+                notificationService.createUserNotification(title, content, order.getUserId(), distribution.getId());
+            }
         }
     }
 
 }
-
-

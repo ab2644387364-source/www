@@ -26,3 +26,6 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
+  data:
+    mongodb:
+      uri: mongodb://192.168.150.103:27017/wuliu_track

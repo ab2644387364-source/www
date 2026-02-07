@@ -51,6 +51,13 @@ public class NotificationService {
     }
 
     /**
+     * 创建用户通知（指定用户可见）
+     */
+    public Notification createUserNotification(String title, String content, String userId, String distributionId) {
+        return create(title, content, "order", userId, distributionId);
+    }
+
+    /**
      * 获取所有通知
      */
     public List<Notification> findAll() {
@@ -88,6 +95,24 @@ public class NotificationService {
      */
     public void markAllAsRead() {
         List<Notification> notifications = notificationRepository.findAll();
+        notifications.forEach(n -> n.setIsRead(true));
+        notificationRepository.saveAll(notifications);
+    }
+
+    /**
+     * 获取用户的未读数量
+     */
+    public long getUnreadCountByUserId(String userId) {
+        return notificationRepository.countByUserIdAndIsReadFalse(userId) +
+                notificationRepository.countByUserIdIsNullAndIsReadFalse();
+    }
+
+    /**
+     * 标记用户所有通知为已读
+     */
+    public void markAllAsReadByUserId(String userId) {
+        List<Notification> notifications = notificationRepository
+                .findByUserIdOrUserIdIsNullOrderByCreateTimeDesc(userId);
         notifications.forEach(n -> n.setIsRead(true));
         notificationRepository.saveAll(notifications);
     }

@@ -72,6 +72,21 @@ const routes = [
                 component: () => import('@/views/delivery/List'),
                 meta: { auth: true, role: 'admin' }
             },
+            {
+                path: 'tracking/map',
+                component: () => import('@/views/tracking/TrackingMap'),
+                meta: { auth: true, role: 'admin' }
+            },
+            {
+                path: 'tracking/map',
+                component: () => import('@/views/tracking/TrackingMap'),
+                meta: { auth: true, role: 'admin' }
+            },
+            {
+                path: 'order/manage',
+                component: () => import('@/views/order/OrderManage'),
+                meta: { auth: true, role: 'admin' }
+            },
 
             {
                 path: 'analyze/in',
@@ -82,6 +97,18 @@ const routes = [
             {
                 path: 'analyze/out',
                 component: () => import('@/views/analyze/Out'),
+                meta: { auth: true, role: 'admin' }
+            },
+
+            {
+                path: 'inventory/manage',
+                component: () => import('@/views/inventory/InventoryManage'),
+                meta: { auth: true, role: 'admin' }
+            },
+
+            {
+                path: 'report/center',
+                component: () => import('@/views/report/ReportCenter'),
                 meta: { auth: true, role: 'admin' }
             },
 
@@ -111,6 +138,11 @@ const routes = [
                 meta: { auth: true },
             },
             {
+                path: 'user/dashboard',
+                component: () => import('@/views/user/UserDashboard'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
                 path: 'user/profile',
                 component: () => import('@/views/user/Profile'),
                 meta: { auth: true, role: 'user' },
@@ -128,6 +160,62 @@ const routes = [
             {
                 path: 'user/pay',
                 component: () => import('@/views/user/Payment'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'user/orders',
+                component: () => import('@/views/user/MyOrders'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'user/orders/:id',
+                component: () => import('@/views/user/OrderDetail'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'user/freight',
+                component: () => import('@/views/user/FreightEstimate'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'user/tracking',
+                component: () => import('@/views/user/UserTrackingMap'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'user/report',
+                component: () => import('@/views/user/TransportReport'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'user/expense',
+                component: () => import('@/views/user/ExpenseAnalysis'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'user/notification',
+                component: () => import('@/views/user/UserNotification'),
+                meta: { auth: true, role: 'user' },
+            },
+            // 客服中心路由
+            {
+                path: 'support',
+                component: () => import('@/views/support/CustomerService'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'support/faq',
+                component: () => import('@/views/support/FAQ'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'support/feedback',
+                component: () => import('@/views/support/Feedback'),
+                meta: { auth: true, role: 'user' },
+            },
+            {
+                path: 'support/contact',
+                component: () => import('@/views/support/ContactUs'),
                 meta: { auth: true, role: 'user' },
             },
 

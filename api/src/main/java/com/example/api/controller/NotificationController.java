@@ -65,4 +65,33 @@ public class NotificationController {
                 notification.getUserId(),
                 notification.getDistributionId());
     }
+
+    /**
+     * 获取当前用户的通知
+     */
+    @GetMapping("/user/{userId}")
+    public List<Notification> findByUserId(@PathVariable String userId) {
+        return notificationService.findByUserId(userId);
+    }
+
+    /**
+     * 获取用户的未读数量
+     */
+    @GetMapping("/user/{userId}/unread-count")
+    public Map<String, Object> getUserUnreadCount(@PathVariable String userId) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", notificationService.getUnreadCountByUserId(userId));
+        return result;
+    }
+
+    /**
+     * 标记用户所有通知为已读
+     */
+    @PutMapping("/user/{userId}/read-all")
+    public Map<String, Object> markAllAsReadByUser(@PathVariable String userId) {
+        notificationService.markAllAsReadByUserId(userId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        return result;
+    }
 }

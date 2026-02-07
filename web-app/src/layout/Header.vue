@@ -54,6 +54,7 @@
 
 <script>
 import { GetUnreadCount } from '../api/notification'
+import { eventBus } from '@/utils/eventBus'
 
 export default {
 
@@ -98,12 +99,15 @@ export default {
     this.timer = setInterval(() => {
       this.loadUnreadCount()
     }, 30000)
+    // 监听标记已读事件，立即刷新未读数
+    eventBus.$on('notification-read', this.loadUnreadCount)
   },
 
   beforeDestroy() {
     if (this.timer) {
       clearInterval(this.timer)
     }
+    eventBus.$off('notification-read', this.loadUnreadCount)
   },
 
   methods: {

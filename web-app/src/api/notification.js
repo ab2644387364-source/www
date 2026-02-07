@@ -48,3 +48,29 @@ export function AddTrackRecord(distributionId, record) {
         data: record
     })
 }
+
+// ===== 用户端通知API =====
+
+// 获取用户的通知
+export function GetUserNotifications(userId) {
+    return request({
+        url: `/notification/user/${userId}`,
+        method: 'get'
+    })
+}
+
+// 获取用户未读数量
+export function GetUserUnreadCount(userId) {
+    return request({
+        url: `/notification/user/${userId}/unread-count`,
+        method: 'get'
+    })
+}
+
+// 标记用户所有通知为已读
+export function MarkAllAsReadByUser(userId) {
+    return request({
+        url: `/notification/user/${userId}/read-all`,
+        method: 'put'
+    })
+}

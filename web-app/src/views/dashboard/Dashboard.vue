@@ -1,77 +1,126 @@
 <template>
   <div class="dashboard">
+    <!-- 欢迎横幅 -->
+    <div class="welcome-banner">
+      <div class="welcome-content">
+        <h1>欢迎回来，管理员</h1>
+        <p>以下是系统运营数据概览，祝您工作愉快！</p>
+      </div>
+      <div class="welcome-time">
+        <a-icon type="clock-circle" />
+        <span>{{ currentTime }}</span>
+      </div>
+    </div>
+
     <!-- 统计卡片区域 -->
-    <a-row :gutter="16" class="stat-cards">
+    <a-row :gutter="24" class="stat-cards">
       <a-col :span="6">
-        <a-card class="stat-card stat-card-primary">
-          <a-statistic
-            title="牲畜种类"
-            :value="overview.commodityCount || 0"
-            :value-style="{ color: '#1890ff', fontSize: '32px' }"
-          >
-            <template #prefix>
-              <a-icon type="appstore" />
-            </template>
-          </a-statistic>
-        </a-card>
+        <div class="stat-card gradient-blue">
+          <div class="stat-icon-bg">
+            <a-icon type="appstore" />
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ overview.commodityCount || 0 }}</div>
+            <div class="stat-title">牲畜种类</div>
+          </div>
+        </div>
       </a-col>
       <a-col :span="6">
-        <a-card class="stat-card stat-card-success">
-          <a-statistic
-            title="配送订单"
-            :value="overview.distributionCount || 0"
-            :value-style="{ color: '#52c41a', fontSize: '32px' }"
-          >
-            <template #prefix>
-              <a-icon type="car" />
-            </template>
-          </a-statistic>
-        </a-card>
+        <div class="stat-card gradient-green">
+          <div class="stat-icon-bg">
+            <a-icon type="car" />
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ overview.distributionCount || 0 }}</div>
+            <div class="stat-title">配送订单</div>
+          </div>
+        </div>
       </a-col>
       <a-col :span="6">
-        <a-card class="stat-card stat-card-warning">
-          <a-statistic
-            title="运输中"
-            :value="overview.transportingCount || 0"
-            :value-style="{ color: '#fa8c16', fontSize: '32px' }"
-          >
-            <template #prefix>
-              <a-icon type="sync" spin />
-            </template>
-          </a-statistic>
-        </a-card>
+        <div class="stat-card gradient-orange">
+          <div class="stat-icon-bg">
+            <a-icon type="sync" :spin="overview.transportingCount > 0" />
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ overview.transportingCount || 0 }}</div>
+            <div class="stat-title">运输中</div>
+          </div>
+        </div>
       </a-col>
       <a-col :span="6">
-        <a-card class="stat-card stat-card-info">
-          <a-statistic
-            title="仓库数量"
-            :value="overview.warehouseCount || 0"
-            :value-style="{ color: '#722ed1', fontSize: '32px' }"
-          >
-            <template #prefix>
-              <a-icon type="home" />
-            </template>
-          </a-statistic>
-        </a-card>
+        <div class="stat-card gradient-purple">
+          <div class="stat-icon-bg">
+            <a-icon type="home" />
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ overview.warehouseCount || 0 }}</div>
+            <div class="stat-title">仓库数量</div>
+          </div>
+        </div>
       </a-col>
     </a-row>
 
+    <!-- 运输状态快速指标 -->
+    <div class="quick-stats">
+      <div class="quick-stat-item">
+        <span class="dot dot-orange"></span>
+        <span class="label">待调度</span>
+        <span class="value">{{ transport.pending || 0 }}</span>
+      </div>
+      <div class="quick-stat-item">
+        <span class="dot dot-green"></span>
+        <span class="label">运输中</span>
+        <span class="value">{{ transport.transporting || 0 }}</span>
+      </div>
+      <div class="quick-stat-item">
+        <span class="dot dot-blue"></span>
+        <span class="label">已完成</span>
+        <span class="value">{{ transport.completed || 0 }}</span>
+      </div>
+      <div class="quick-stat-item">
+        <span class="dot dot-red"></span>
+        <span class="label">异常</span>
+        <span class="value">{{ transport.warning || 0 }}</span>
+      </div>
+    </div>
+
     <!-- 图表区域 -->
-    <a-row :gutter="16" class="chart-row">
+    <a-row :gutter="24" class="chart-row">
       <a-col :span="12">
-        <a-card title="运输状态分布" :bordered="false" class="chart-card">
+        <a-card :bordered="false" class="chart-card">
+          <template slot="title">
+            <div class="card-title">
+              <a-icon type="pie-chart" />
+              <span>运输状态分布</span>
+            </div>
+          </template>
           <div ref="pieChart" class="chart-container"></div>
         </a-card>
       </a-col>
       <a-col :span="12">
-        <a-card title="近7天运输趋势" :bordered="false" class="chart-card">
+        <a-card :bordered="false" class="chart-card">
+          <template slot="title">
+            <div class="card-title">
+              <a-icon type="line-chart" />
+              <span>近7天运输趋势</span>
+            </div>
+          </template>
           <div ref="lineChart" class="chart-container"></div>
         </a-card>
       </a-col>
     </a-row>
 
     <!-- 最近动态 -->
-    <a-card title="最新运输动态" :bordered="false" class="activity-card">
+    <a-card :bordered="false" class="activity-card">
+      <template slot="title">
+        <div class="card-title">
+          <a-icon type="history" />
+          <span>最新运输动态</span>
+        </div>
+      </template>
+      <template slot="extra">
+        <a-button type="link" @click="$router.push('/delivery/list')">查看全部</a-button>
+      </template>
       <a-table
         :columns="activityColumns"
         :data-source="activities"
@@ -86,9 +135,9 @@
           <a-tag v-if="status===2" color="blue">已完成</a-tag>
         </span>
         <span slot="warningLevel" slot-scope="warningLevel">
-          <a-tag v-if="warningLevel===2" color="red">严重</a-tag>
-          <a-tag v-else-if="warningLevel===1" color="orange">一般</a-tag>
-          <a-tag v-else color="green">正常</a-tag>
+          <a-badge v-if="warningLevel===2" status="error" text="严重" />
+          <a-badge v-else-if="warningLevel===1" status="warning" text="一般" />
+          <a-badge v-else status="success" text="正常" />
         </span>
       </a-table>
     </a-card>
@@ -99,124 +148,166 @@
 import * as echarts from 'echarts'
 import { GetDashboard } from '../../api/statistics'
 
-const activityColumns = [
-  { title: '押运员', dataIndex: 'driver' },
-  { title: '车牌号', dataIndex: 'number' },
+var activityColumns = [
+  { title: '押运员', dataIndex: 'driver', width: 100 },
+  { title: '车牌号', dataIndex: 'number', width: 100 },
   { title: '起点', dataIndex: 'origin' },
   { title: '目的地', dataIndex: 'destination' },
   { title: '当前位置', dataIndex: 'currentNode' },
-  { title: '状态', dataIndex: 'status', scopedSlots: { customRender: 'status' } },
-  { title: '异常', dataIndex: 'warningLevel', scopedSlots: { customRender: 'warningLevel' } },
+  { title: '状态', dataIndex: 'status', scopedSlots: { customRender: 'status' }, width: 100 },
+  { title: '异常', dataIndex: 'warningLevel', scopedSlots: { customRender: 'warningLevel' }, width: 100 }
 ]
 
 export default {
   name: 'Dashboard',
-  data() {
+  data: function() {
     return {
       loading: true,
       overview: {},
       transport: {},
       trend: [],
       activities: [],
-      activityColumns,
+      activityColumns: activityColumns,
       pieChart: null,
       lineChart: null,
+      currentTime: ''
     }
   },
-  mounted() {
+  mounted: function() {
     this.loadData()
+    this.updateTime()
+    this.timeInterval = setInterval(this.updateTime, 1000)
     window.addEventListener('resize', this.handleResize)
   },
-  beforeDestroy() {
+  beforeDestroy: function() {
     window.removeEventListener('resize', this.handleResize)
     if (this.pieChart) this.pieChart.dispose()
     if (this.lineChart) this.lineChart.dispose()
+    if (this.timeInterval) clearInterval(this.timeInterval)
   },
   methods: {
-    loadData() {
-      this.loading = true
-      GetDashboard().then(res => {
-        this.overview = res.overview || {}
-        this.transport = res.transport || {}
-        this.trend = res.trend || []
-        this.activities = res.activities || []
-        this.loading = false
-        this.$nextTick(() => {
-          this.initPieChart()
-          this.initLineChart()
-        })
-      }).catch(() => {
-        this.loading = false
+    updateTime: function() {
+      var now = new Date()
+      this.currentTime = now.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
       })
     },
-    initPieChart() {
-      if (this.pieChart) this.pieChart.dispose()
-      this.pieChart = echarts.init(this.$refs.pieChart)
+    loadData: function() {
+      var self = this
+      self.loading = true
+      GetDashboard().then(function(res) {
+        self.overview = res.overview || {}
+        self.transport = res.transport || {}
+        self.trend = res.trend || []
+        self.activities = res.activities || []
+        self.loading = false
+        self.$nextTick(function() {
+          self.initPieChart()
+          self.initLineChart()
+        })
+      }).catch(function() {
+        self.loading = false
+      })
+    },
+    initPieChart: function() {
+      var self = this
+      if (self.pieChart) self.pieChart.dispose()
+      self.pieChart = echarts.init(self.$refs.pieChart)
       
-      const option = {
-        tooltip: { trigger: 'item' },
+      var option = {
+        tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
         legend: { bottom: '5%', left: 'center' },
         series: [{
           name: '运输状态',
           type: 'pie',
-          radius: ['40%', '70%'],
+          radius: ['45%', '75%'],
+          center: ['50%', '45%'],
           avoidLabelOverlap: false,
           itemStyle: {
-            borderRadius: 10,
+            borderRadius: 8,
             borderColor: '#fff',
-            borderWidth: 2
+            borderWidth: 3
           },
           label: { show: false, position: 'center' },
           emphasis: {
-            label: { show: true, fontSize: 20, fontWeight: 'bold' }
+            label: { show: true, fontSize: 18, fontWeight: 'bold' },
+            itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' }
           },
           labelLine: { show: false },
           data: [
-            { value: this.transport.pending || 0, name: '待调度', itemStyle: { color: '#fa8c16' } },
-            { value: this.transport.transporting || 0, name: '运输中', itemStyle: { color: '#52c41a' } },
-            { value: this.transport.completed || 0, name: '已完成', itemStyle: { color: '#1890ff' } },
-            { value: this.transport.warning || 0, name: '异常', itemStyle: { color: '#f5222d' } },
+            { value: self.transport.pending || 0, name: '待调度', itemStyle: { color: '#faad14' } },
+            { value: self.transport.transporting || 0, name: '运输中', itemStyle: { color: '#52c41a' } },
+            { value: self.transport.completed || 0, name: '已完成', itemStyle: { color: '#1890ff' } },
+            { value: self.transport.warning || 0, name: '异常', itemStyle: { color: '#ff4d4f' } }
           ]
         }]
       }
-      this.pieChart.setOption(option)
+      self.pieChart.setOption(option)
     },
-    initLineChart() {
-      if (this.lineChart) this.lineChart.dispose()
-      this.lineChart = echarts.init(this.$refs.lineChart)
+    initLineChart: function() {
+      var self = this
+      if (self.lineChart) self.lineChart.dispose()
+      self.lineChart = echarts.init(self.$refs.lineChart)
       
-      const dates = this.trend.map(item => item.date)
-      const created = this.trend.map(item => item.created)
-      const completed = this.trend.map(item => item.completed)
+      var dates = self.trend.map(function(item) { return item.date })
+      var created = self.trend.map(function(item) { return item.created })
+      var completed = self.trend.map(function(item) { return item.completed })
       
-      const option = {
-        tooltip: { trigger: 'axis' },
-        legend: { data: ['新建订单', '完成订单'], bottom: '5%' },
-        grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
-        xAxis: { type: 'category', boundaryGap: false, data: dates },
-        yAxis: { type: 'value' },
+      var option = {
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { data: ['新建订单', '完成订单'], bottom: '0%' },
+        grid: { left: '3%', right: '4%', bottom: '15%', top: '10%', containLabel: true },
+        xAxis: { type: 'category', boundaryGap: false, data: dates, axisLine: { lineStyle: { color: '#d9d9d9' } }, axisLabel: { color: '#666' } },
+        yAxis: { type: 'value', axisLine: { show: false }, splitLine: { lineStyle: { color: '#f0f0f0' } }, axisLabel: { color: '#666' } },
         series: [
           {
             name: '新建订单',
             type: 'line',
             smooth: true,
+            symbol: 'circle',
+            symbolSize: 8,
             data: created,
-            areaStyle: { opacity: 0.3 },
-            itemStyle: { color: '#1890ff' }
+            areaStyle: { 
+              color: {
+                type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+                colorStops: [
+                  { offset: 0, color: 'rgba(24, 144, 255, 0.3)' },
+                  { offset: 1, color: 'rgba(24, 144, 255, 0.05)' }
+                ]
+              }
+            },
+            lineStyle: { color: '#1890ff', width: 3 },
+            itemStyle: { color: '#1890ff', borderWidth: 2, borderColor: '#fff' }
           },
           {
             name: '完成订单',
             type: 'line',
             smooth: true,
+            symbol: 'circle',
+            symbolSize: 8,
             data: completed,
-            areaStyle: { opacity: 0.3 },
-            itemStyle: { color: '#52c41a' }
+            areaStyle: { 
+              color: {
+                type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+                colorStops: [
+                  { offset: 0, color: 'rgba(82, 196, 26, 0.3)' },
+                  { offset: 1, color: 'rgba(82, 196, 26, 0.05)' }
+                ]
+              }
+            },
+            lineStyle: { color: '#52c41a', width: 3 },
+            itemStyle: { color: '#52c41a', borderWidth: 2, borderColor: '#fff' }
           }
         ]
       }
-      this.lineChart.setOption(option)
+      self.lineChart.setOption(option)
     },
-    handleResize() {
+    handleResize: function() {
       if (this.pieChart) this.pieChart.resize()
       if (this.lineChart) this.lineChart.resize()
     }
@@ -227,57 +318,152 @@ export default {
 <style scoped>
 .dashboard {
   padding: 24px;
-  background: #f0f2f5;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
   min-height: 100vh;
 }
 
+/* 欢迎横幅 */
+.welcome-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+.welcome-content h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+}
+.welcome-content p {
+  margin: 8px 0 0 0;
+  opacity: 0.85;
+  font-size: 14px;
+}
+.welcome-time {
+  font-size: 16px;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 统计卡片 */
 .stat-cards {
   margin-bottom: 24px;
 }
-
 .stat-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
-  transition: all 0.3s;
+  border-radius: 16px;
+  padding: 24px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  height: 120px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
-
 .stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+}
+.gradient-blue {
+  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+}
+.gradient-green {
+  background: linear-gradient(135deg, #52c41a 0%, #95de64 100%);
+}
+.gradient-orange {
+  background: linear-gradient(135deg, #fa8c16 0%, #ffc53d 100%);
+}
+.gradient-purple {
+  background: linear-gradient(135deg, #722ed1 0%, #b37feb 100%);
+}
+.stat-icon-bg {
+  font-size: 48px;
+  opacity: 0.25;
+  margin-right: 20px;
+}
+.stat-info {
+  flex: 1;
+}
+.stat-value {
+  font-size: 36px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+.stat-title {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
 }
 
-.stat-card-primary {
-  border-top: 3px solid #1890ff;
+/* 快速指标条 */
+.quick-stats {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 32px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.quick-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot-orange { background: #faad14; }
+.dot-green { background: #52c41a; }
+.dot-blue { background: #1890ff; }
+.dot-red { background: #ff4d4f; }
+.quick-stat-item .label {
+  color: #666;
+  font-size: 14px;
+}
+.quick-stat-item .value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
 }
 
-.stat-card-success {
-  border-top: 3px solid #52c41a;
-}
-
-.stat-card-warning {
-  border-top: 3px solid #fa8c16;
-}
-
-.stat-card-info {
-  border-top: 3px solid #722ed1;
-}
-
+/* 图表卡片 */
 .chart-row {
   margin-bottom: 24px;
 }
-
 .chart-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
-
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+.card-title i {
+  color: #1890ff;
+}
 .chart-container {
-  height: 300px;
+  height: 320px;
   width: 100%;
 }
 
+/* 活动卡片 */
 .activity-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
 </style>

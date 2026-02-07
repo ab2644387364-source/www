@@ -159,7 +159,7 @@ export default {
             this.$store.commit('user/saveLoginUser', res.data.admin)
             this.$store.commit('user/saveLoginRole', 'admin')
             setTimeout(() => {
-              this.$router.push("/commodity")
+              this.$router.push("/dashboard")
               this.submitLoading = false
             }, 700)
             this.$message.success("登录成功")
@@ -188,7 +188,7 @@ export default {
           this.$store.commit('user/saveLoginUser', res.data.user)
           this.$store.commit('user/saveLoginRole', 'user')
           setTimeout(() => {
-            this.$router.push("/user/profile")
+            this.$router.push("/user/dashboard")
             this.submitLoading = false
           }, 700)
           this.$message.success("登录成功")
