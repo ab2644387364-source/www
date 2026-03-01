@@ -173,8 +173,8 @@ export default {
   },
   computed: {
     userName: function() {
-      var user = this.$store.state.user.loginUser
-      return user ? user.name : ''
+      var user = this.$store.state.user.details
+      return user ? (user.name || user.email) : ''
     }
   },
   mounted: function() {

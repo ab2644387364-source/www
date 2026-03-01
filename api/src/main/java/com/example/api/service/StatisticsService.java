@@ -1,6 +1,7 @@
 package com.example.api.service;
 
 import com.example.api.repository.*;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,8 +31,9 @@ public class StatisticsService {
     private SaleRepository saleRepository;
 
     /**
-     * 获取总览统计数据
+     * 获取总览统计数据（Redis缓存5分钟）
      */
+    @Cacheable(value = "stats:overview", unless = "#result == null")
     public Map<String, Object> getOverview() {
         Map<String, Object> result = new HashMap<>();
 
@@ -60,8 +62,9 @@ public class StatisticsService {
     }
 
     /**
-     * 获取运输状态统计
+     * 获取运输状态统计（Redis缓存3分钟）
      */
+    @Cacheable(value = "stats:transport", unless = "#result == null")
     public Map<String, Object> getTransportStats() {
         Map<String, Object> result = new HashMap<>();
 
@@ -81,8 +84,9 @@ public class StatisticsService {
     }
 
     /**
-     * 获取近7天运输趋势（模拟数据，实际应根据时间字段查询）
+     * 获取近7天运输趋势（Redis缓存10分钟）
      */
+    @Cacheable(value = "stats:trend", unless = "#result == null")
     public List<Map<String, Object>> getTrend() {
         List<Map<String, Object>> result = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");
@@ -105,8 +109,9 @@ public class StatisticsService {
     }
 
     /**
-     * 获取最近的配送动态
+     * 获取最近的配送动态（Redis缓存2分钟）
      */
+    @Cacheable(value = "stats:activities", unless = "#result == null")
     public List<Map<String, Object>> getRecentActivities() {
         List<Map<String, Object>> result = new ArrayList<>();
 
